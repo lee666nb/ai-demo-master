@@ -1,0 +1,10 @@
+server:
+  port: 10007
+
+spring:
+  application:
+    name: prompt-demo
+
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}

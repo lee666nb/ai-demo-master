@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: qwq-demo
+
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwq-32b

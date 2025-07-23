@@ -1,0 +1,11 @@
+
+
+spring:
+  application:
+    name: bailian-agent
+  ai:
+    dashscope:
+      agent:
+        app-id: ${AGENT_ID}
+      api-key: ${AI_DASHSCOPE_API_KEY}
+      #workspace-id: ${AI_DASHSCOPE_WORKSPACE_ID} #??????????????????????

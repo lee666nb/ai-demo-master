@@ -1,0 +1,13 @@
+
+spring:
+  application:
+    name: higress-demo
+
+  ai:
+    openai:
+      api-key: cbfda275-56ff-4d45-a984-6482502e2f25
+      base-url: http://192.168.65.185:8080/v1
+      chat:
+        options:
+          model: deepseek-chat
+

@@ -1,0 +1,12 @@
+
+server:
+  port: 9000
+spring:
+  application:
+    name: tlmall-order-mcp-server
+  ai:
+    mcp:
+      server:
+        name: my-order-server
+        version: 1.0.0
+

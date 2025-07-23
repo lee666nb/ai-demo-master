@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="alibaba-ai-demo" />
+        <module name="qwq-demo" />
+        <module name="chat-ollama-demo" />
+        <module name="higress-demo" />
+        <module name="alibaba-deepseek-demo" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ai-demo" options="-parameters" />
+      <module name="alibaba-ai-demo" options="-parameters" />
+      <module name="alibaba-deepseek-demo" options="-parameters" />
+      <module name="chat-ollama-demo" options="-parameters" />
+      <module name="higress-demo" options="-parameters" />
+      <module name="qwq-demo" options="-parameters" />
+    </option>
+  </component>
+</project>

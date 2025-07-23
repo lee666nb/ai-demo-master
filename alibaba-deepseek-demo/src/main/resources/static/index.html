@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI聊天室</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>AI聊天室</h1>
+            <div class="connection-status disconnected" id="connectionStatus">
+                未连接
+            </div>
+            <div class="chat-mode">
+                <label>
+                    <input type="radio" name="mode" value="normal" checked>
+                    普通模式
+                </label>
+                <label>
+                    <input type="radio" name="mode" value="stream">
+                    流式模式
+                </label>
+                <label>
+                    <input type="radio" name="mode" value="sse">
+                    SSE模式
+                </label>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai-message">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-text">您好！我是您的AI助手，有什么可以帮助您的吗？</div>
+                    <div class="message-time" id="welcomeTime"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span>AI正在思考中</span>
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <div class="input-container">
+                <textarea id="messageInput" placeholder="请输入您的消息..." rows="1"></textarea>
+                <button id="sendButton">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/chat.js"></script>
+</body>
+</html>

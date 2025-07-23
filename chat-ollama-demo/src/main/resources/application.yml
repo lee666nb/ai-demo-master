@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: chat-ollama-demo
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: deepseek-r1:1.5b
