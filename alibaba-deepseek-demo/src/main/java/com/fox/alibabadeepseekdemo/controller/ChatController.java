@@ -5,10 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
@@ -17,55 +14,120 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/ai")
+@CrossOrigin(origins = "*") // 添加跨域支持
 public class ChatController {
     private final ChatClient chatClient;
  
-    // 构造方法注入 ChatClient.Builder，用于构建 ChatClient 实例
     public ChatController(ChatClient.Builder chatClient) {
         this.chatClient = chatClient.build();
     }
 
-    @GetMapping(value = "/chat" )
-    public String chat(@RequestParam(value = "input") String input) {
-        return this.chatClient.prompt()
-                .user(input)
-                .call()
-                .content();
+    @GetMapping(value = "/chat")
+    public ResponseEntity<String> chat(@RequestParam(value = "input") String input) {
+        try {
+            if (input == null || input.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("输入不能为空");
+            }
+
+            String response = this.chatClient.prompt()
+                    .user(input)
+                    .call()
+                    .content();
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body("AI服务暂时不可用，请稍后重试。错误信息：" + e.getMessage());
+        }
     }
 
-    @GetMapping(value = "/stream", produces = "text/html;charset=UTF-8")
-    public Flux<String> stream(String input) {
-        return this.chatClient.prompt()
-                .user(input)
-                .stream()
-                .content();
-    }
+    @GetMapping(value = "/stream", produces = "text/plain;charset=UTF-8")
+    public Flux<String> stream(@RequestParam(value = "input") String input) {
+        try {
+            if (input == null || input.trim().isEmpty()) {
+                return Flux.just("输入不能为空");
+            }
 
+            return this.chatClient.prompt()
+                    .user(input)
+                    .stream()
+                    .content()
+                    .onErrorReturn("AI服务出现错误，请稍后重试");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Flux.just("AI服务暂时不可用：" + e.getMessage());
+        }
+    }
 
     @GetMapping(value = "/sseChat")
     public SseEmitter sseChat(@RequestParam(value = "input", defaultValue = "你是谁") String input) {
-        SseEmitter sseEmitter = new SseEmitter() {
+        SseEmitter sseEmitter = new SseEmitter(30000L) { // 设置30秒超时
             @Override
             protected void extendResponse(ServerHttpResponse outputMessage) {
                 HttpHeaders headers = outputMessage.getHeaders();
                 headers.setContentType(new MediaType("text", "event-stream", StandardCharsets.UTF_8));
+                headers.set("Cache-Control", "no-cache");
+                headers.set("Connection", "keep-alive");
             }
         };
 
-        Flux<String> stream = chatClient
-                .prompt()
-                .user(input)
-                .stream()
-                .content();
-
-        stream.subscribe(token -> {
-            try {
-                sseEmitter.send(token);
-            } catch (IOException e) {
-                sseEmitter.completeWithError(e);
+        try {
+            if (input == null || input.trim().isEmpty()) {
+                sseEmitter.send("输入不能为空");
+                sseEmitter.complete();
+                return sseEmitter;
             }
-        }, sseEmitter::completeWithError, sseEmitter::complete);
+
+            Flux<String> stream = chatClient
+                    .prompt()
+                    .user(input)
+                    .stream()
+                    .content();
+
+            stream.subscribe(
+                token -> {
+                    try {
+                        sseEmitter.send(token);
+                    } catch (IOException e) {
+                        sseEmitter.completeWithError(e);
+                    }
+                },
+                error -> {
+                    try {
+                        sseEmitter.send("AI服务出现错误：" + error.getMessage());
+                    } catch (IOException e) {
+                        // 忽略发送错误
+                    }
+                    sseEmitter.completeWithError(error);
+                },
+                sseEmitter::complete
+            );
+        } catch (Exception e) {
+            try {
+                sseEmitter.send("AI服务暂时不可用：" + e.getMessage());
+            } catch (IOException ioException) {
+                // 忽略发送错误
+            }
+            sseEmitter.completeWithError(e);
+        }
+
         return sseEmitter;
     }
 
+    // 添加健康检查接口
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        try {
+            // 发送一个简单的测试请求
+            String testResponse = this.chatClient.prompt()
+                    .user("hello")
+                    .call()
+                    .content();
+            return ResponseEntity.ok("AI服务正常运行");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("AI服务异常：" + e.getMessage());
+        }
+    }
 }

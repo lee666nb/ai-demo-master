@@ -39,6 +39,34 @@ body {
     margin-bottom: 10px;
 }
 
+.header-controls {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.control-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
 .chat-mode {
     display: flex;
     justify-content: center;
@@ -64,6 +92,56 @@ body {
     accent-color: white;
 }
 
+.settings-panel {
+    background: white;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.settings-content h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.setting-item label {
+    color: #495057;
+    font-weight: 500;
+}
+
+.setting-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
+}
+
+.setting-item select {
+    padding: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    color: #495057;
+}
+
+.input-tips {
+    text-align: center;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 8px;
+    font-style: italic;
+}
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -78,8 +156,14 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .message-avatar {
@@ -124,12 +208,25 @@ body {
     padding: 12px 16px;
     border-radius: 18px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    line-height: 1.4;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    transition: all 0.2s ease;
 }
 
 .user-message .message-text {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    box-shadow: 0 3px 6px rgba(102, 126, 234, 0.3);
+}
+
+.message-text:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.user-message .message-text:hover {
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
 }
 
 .message-time {
@@ -153,11 +250,14 @@ body {
     border-radius: 25px;
     padding: 10px 15px;
     border: 2px solid transparent;
-    transition: border-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .input-container:focus-within {
     border-color: #667eea;
+    background: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 #messageInput {
@@ -170,6 +270,11 @@ body {
     line-height: 1.4;
     max-height: 120px;
     min-height: 24px;
+    font-family: inherit;
+}
+
+#messageInput::placeholder {
+    color: #adb5bd;
 }
 
 #sendButton {
@@ -233,48 +338,65 @@ body {
 }
 
 .error-message {
-    background-color: #f8d7da !important;
-    color: #721c24 !important;
-    border: 1px solid #f5c6cb;
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    color: white !important;
+    border-left: 4px solid #721c24;
+}
+
+.system-message {
+    text-align: center;
+    color: #6c757d;
+    font-size: 12px;
+    margin: 10px 0;
+    font-style: italic;
+    padding: 8px;
+    background: rgba(108, 117, 125, 0.1);
+    border-radius: 12px;
 }
 
 .connection-status {
     position: absolute;
     top: 10px;
     right: 20px;
-    padding: 5px 10px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 15px;
     font-size: 12px;
     font-weight: 500;
+    min-width: 80px;
+    text-align: center;
+    transition: all 0.3s ease;
 }
 
 .connection-status.connected {
-    background-color: rgba(40, 167, 69, 0.2);
-    color: #155724;
+    background-color: rgba(40, 167, 69, 0.8);
+    color: white;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
 }
 
 .connection-status.disconnected {
-    background-color: rgba(220, 53, 69, 0.2);
-    color: #721c24;
+    background-color: rgba(220, 53, 69, 0.8);
+    color: white;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
 }
 
 /* 滚动条样式 */
 .chat-messages::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .chat-messages::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 3px;
+    border-radius: 4px;
+    margin: 10px 0;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 4px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: linear-gradient(180deg, #5a6fd8, #6a4190);
 }
 
 /* 响应式设计 */
@@ -289,12 +411,59 @@ body {
         border-radius: 0;
     }
 
-    .chat-mode {
-        flex-direction: column;
-        gap: 5px;
+    .header-controls {
+        position: static;
+        justify-content: center;
+        margin-bottom: 10px;
     }
 
-    .message-content {
-        max-width: 85%;
+    .control-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .chat-mode {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .chat-mode label {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .settings-panel {
+        padding: 15px;
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .input-tips {
+        display: none;
+    }
+}
+
+/* 深色模式支持（可选） */
+@media (prefers-color-scheme: dark) {
+    .settings-panel {
+        background: #2d3748;
+        color: white;
+    }
+
+    .settings-content h3 {
+        color: white;
+    }
+
+    .setting-item {
+        background: #4a5568;
+    }
+
+    .setting-item label {
+        color: #e2e8f0;
     }
 }

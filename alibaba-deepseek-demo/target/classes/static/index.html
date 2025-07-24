@@ -9,9 +9,20 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>AI聊天室</h1>
+            <h1>AI智能助手</h1>
             <div class="connection-status disconnected" id="connectionStatus">
-                未连接
+                检查连接中...
+            </div>
+            <div class="header-controls">
+                <button class="control-btn" onclick="chatUtils.clearChat()" title="清空聊天记录">
+                    🗑️
+                </button>
+                <button class="control-btn" onclick="chatUtils.exportChat()" title="导出聊天记录">
+                    📤
+                </button>
+                <button class="control-btn" onclick="toggleSettings()" title="设置">
+                    ⚙️
+                </button>
             </div>
             <div class="chat-mode">
                 <label>
@@ -29,11 +40,40 @@
             </div>
         </div>
 
+        <div class="settings-panel" id="settingsPanel" style="display: none;">
+            <div class="settings-content">
+                <h3>聊天设置</h3>
+                <div class="setting-item">
+                    <label for="autoScroll">自动滚动到底部</label>
+                    <input type="checkbox" id="autoScroll" checked>
+                </div>
+                <div class="setting-item">
+                    <label for="showTimestamp">显示时间戳</label>
+                    <input type="checkbox" id="showTimestamp" checked>
+                </div>
+                <div class="setting-item">
+                    <label for="fontSize">字体大小</label>
+                    <select id="fontSize">
+                        <option value="14px">小</option>
+                        <option value="16px" selected>中</option>
+                        <option value="18px">大</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="chat-messages" id="chatMessages">
             <div class="message ai-message">
                 <div class="message-avatar">🤖</div>
                 <div class="message-content">
-                    <div class="message-text">您好！我是您的AI助手，有什么可以帮助您的吗？</div>
+                    <div class="message-text">您好！我是您的AI助手，有什么可以帮助您的吗？
+
+🔹 支持三种对话模式：普通、流式、SSE
+🔹 双击消息可以复制内容
+🔹 使用↑↓方向键查看消息历史
+🔹 支持导出聊天记录
+
+请输入您的问题开始对话吧！</div>
                     <div class="message-time" id="welcomeTime"></div>
                 </div>
             </div>
@@ -50,16 +90,46 @@
 
         <div class="chat-input">
             <div class="input-container">
-                <textarea id="messageInput" placeholder="请输入您的消息..." rows="1"></textarea>
-                <button id="sendButton">
+                <textarea id="messageInput" placeholder="请输入您的消息... (Enter发送，Shift+Enter换行)" rows="1"></textarea>
+                <button id="sendButton" title="发送消息">
                     <svg viewBox="0 0 24 24" width="20" height="20">
                         <path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
                     </svg>
                 </button>
             </div>
+            <div class="input-tips">
+                小贴士：使用 ↑↓ 键浏览历史消息 | 双击消息复制内容
+            </div>
         </div>
     </div>
 
     <script src="js/chat.js"></script>
+    <script>
+        // 设置面板控制
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 应用设置
+        document.addEventListener('DOMContentLoaded', () => {
+            const autoScrollCheckbox = document.getElementById('autoScroll');
+            const showTimestampCheckbox = document.getElementById('showTimestamp');
+            const fontSizeSelect = document.getElementById('fontSize');
+
+            // 字体大小设置
+            fontSizeSelect.addEventListener('change', (e) => {
+                document.querySelector('.chat-messages').style.fontSize = e.target.value;
+            });
+
+            // 时间戳显示设置
+            showTimestampCheckbox.addEventListener('change', (e) => {
+                const timestamps = document.querySelectorAll('.message-time');
+                timestamps.forEach(timestamp => {
+                    timestamp.style.display = e.target.checked ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
