@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/alibaba-deepseek-demo/src/main/resources/application.yml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/alibaba-deepseek-demo/src/main/resources/application.yml" />
+              <option name="originalContent" value="server:&#10;  port: 8092&#10;&#10;spring:&#10;  application:&#10;    name: alibaba-deepseek-demo&#10;&#10;  # 静态资源配置&#10;  web:&#10;    resources:&#10;      static-locations: classpath:/static/&#10;      cache:&#10;        period: 0&#10;&#10;  # MVC配置&#10;  mvc:&#10;    static-path-pattern: /**&#10;    view:&#10;      prefix: /&#10;      suffix: .html&#10;&#10;  # 添加数据库配置&#10;  datasource:&#10;    url: jdbc:h2:mem:testdb&#10;    driver-class-name: org.h2.Driver&#10;    username: sa&#10;    password: &#10;&#10;  h2:&#10;    console:&#10;      enabled: true&#10;      path: /h2-console&#10;&#10;  jpa:&#10;    database-platform: org.hibernate.dialect.H2Dialect&#10;    hibernate:&#10;      ddl-auto: create-drop&#10;    show-sql: true&#10;&#10;  ai:&#10;    openai:&#10;        # 这写你自己的api！&#10;      api-key: sk-yrihxgdcfjrhjdzknhyteeblftqshdrcphjzehnljshiiipu&#10;      base-url: https://api.siliconflow.cn&#10;      chat:&#10;        options:&#10;          model: Qwen/Qwen2.5-72B-Instruct&#10;&#10;# 日志配置&#10;logging:&#10;  level:&#10;    root: INFO&#10;    org.springframework: DEBUG&#10;    com.fox: DEBUG&#10;" />
+              <option name="updatedContent" value="server:&#10;  port: 8092&#10;&#10;spring:&#10;  application:&#10;    name: alibaba-deepseek-demo&#10;&#10;  # 静态资源配置&#10;  web:&#10;    resources:&#10;      static-locations: classpath:/static/&#10;      cache:&#10;        period: 0&#10;&#10;  # MVC配置&#10;  mvc:&#10;    static-path-pattern: /**&#10;    view:&#10;      prefix: /&#10;      suffix: .html&#10;&#10;  ai:&#10;    openai:&#10;        # 这写你自己的api！&#10;      api-key: sk-yrihxgdcfjrhjdzknhyteeblftqshdrcphjzehnljshiiipu&#10;      base-url: https://api.siliconflow.cn&#10;      chat:&#10;        options:&#10;          model: Qwen/Qwen2.5-72B-Instruct&#10;&#10;# 日志配置&#10;logging:&#10;  level:&#10;    com.fox.alibabadeepseekdemo: DEBUG" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

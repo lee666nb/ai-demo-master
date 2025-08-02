@@ -19,24 +19,6 @@ spring:
       prefix: /
       suffix: .html
 
-  # 添加数据库配置
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-
   ai:
     openai:
         # 这写你自己的api！
@@ -50,4 +32,3 @@ spring:
 logging:
   level:
     com.fox.alibabadeepseekdemo: DEBUG
-    org.springframework.web: DEBUG
