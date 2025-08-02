@@ -13,16 +13,16 @@ public class PageController {
 
     @GetMapping("/login")
     public String loginPage() {
-        return "redirect:/login.html";
+        return "forward:/login.html";
     }
 
     @GetMapping("/register")
     public String registerPage() {
-        return "redirect:/register.html";
+        return "forward:/register.html";
     }
 
     @GetMapping("/chat")
     public String chatPage() {
-        return "redirect:/chat.html";
+        return "forward:/chat.html";
     }
 }
