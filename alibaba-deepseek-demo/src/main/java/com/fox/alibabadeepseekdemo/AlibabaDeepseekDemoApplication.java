@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //666刘雨淙
 @SpringBootApplication
 public class AlibabaDeepseekDemoApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(AlibabaDeepseekDemoApplication.class, args);
     }
