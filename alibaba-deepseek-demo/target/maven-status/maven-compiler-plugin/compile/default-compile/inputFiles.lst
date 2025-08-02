@@ -1,2 +1,8 @@
+D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\config\ChatConfig.java
 D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\controller\ChatController.java
+D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\controller\PageController.java
+D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\service\UserService.java
+D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\controller\UserController.java
+D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\entity\User.java
 D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\AlibabaDeepseekDemoApplication.java
+D:\ai-demo-master\alibaba-deepseek-demo\src\main\java\com\fox\alibabadeepseekdemo\repository\UserRepository.java

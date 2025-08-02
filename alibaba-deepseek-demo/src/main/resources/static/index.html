@@ -10,6 +10,9 @@
     <div class="chat-container">
         <div class="chat-header">
             <h1>AI智能助手</h1>
+            <div class="user-info" style="color: #666; font-size: 14px;">
+                欢迎使用AI聊天室
+            </div>
             <div class="connection-status disconnected" id="connectionStatus">
                 检查连接中...
             </div>
@@ -22,6 +25,9 @@
                 </button>
                 <button class="control-btn" onclick="toggleSettings()" title="设置">
                     ⚙️
+                </button>
+                <button class="control-btn logout-btn" onclick="window.chatRoom.logout()" title="登出">
+                    🚪
                 </button>
             </div>
             <div class="chat-mode">

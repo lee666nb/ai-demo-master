@@ -1,14 +1,53 @@
 server:
-  port: 8088
+  port: 8092
 
 spring:
   application:
     name: alibaba-deepseek-demo
 
+  # 静态资源配置
+  web:
+    resources:
+      static-locations: classpath:/static/
+      cache:
+        period: 0
+
+  # MVC配置
+  mvc:
+    static-path-pattern: /**
+    view:
+      prefix: /
+      suffix: .html
+
+  # 添加数据库配置
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
   ai:
     openai:
-      api-key: sk-sljpozhxgzovbzzpwznptdylmnbmoxiagdntqhiiyydarcjp
+        # 这写你自己的api！
+      api-key: sk-yrihxgdcfjrhjdzknhyteeblftqshdrcphjzehnljshiiipu
       base-url: https://api.siliconflow.cn
       chat:
         options:
           model: Qwen/Qwen2.5-72B-Instruct
+
+# 日志配置
+logging:
+  level:
+    com.fox.alibabadeepseekdemo: DEBUG
+    org.springframework.web: DEBUG

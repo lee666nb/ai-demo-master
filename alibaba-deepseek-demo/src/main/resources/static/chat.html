@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI聊天室 - 智能对话平台</title>
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span class="brand-text">AI聊天室</span>
+                </div>
+                <button class="new-chat-btn" onclick="newChat()">
+                    <i class="fas fa-plus"></i>
+                    <span>新对话</span>
+                </button>
+            </div>
+
+            <div class="chat-history">
+                <div class="history-header">
+                    <h3>最近对话</h3>
+                    <button class="history-search-btn" onclick="toggleSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="search-container" id="searchContainer">
+                    <input type="text" id="searchInput" placeholder="搜索对话..." class="search-input">
+                </div>
+                <div class="history-list" id="chatHistoryList">
+                    <div class="history-placeholder">
+                        <i class="fas fa-comments"></i>
+                        <p>暂无对话记录</p>
+                        <span>开始您的第一次AI对话</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" onclick="openProfileModal()">
+                        <img id="userAvatarImg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM2NjdlZWEiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZmZmZiI+CjxwYXRoIGQ9Ik0xMiAxMmMyLjIxIDAgNC0xLjc5IDQtNHMtMS43OS00LTQtNC00IDEuNzktNCA0IDEuNzkgNCA0IDR6bTAgMmMtMi42NyAwLTggMS4zNC04IDR2MmgxNnYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz4KPHN2Zz4KPC9zdmc+" alt="用户头像" class="avatar-img">
+                        <div class="avatar-status online"></div>
+                    </div>
+                    <div class="user-details">
+                        <span class="username" id="displayUsername">用户</span>
+                        <span class="user-status">在线</span>
+                    </div>
+                    <div class="user-actions">
+                        <button class="user-action-btn" onclick="openSettingsModal()" title="设置">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button class="user-action-btn" onclick="logout()" title="退出登录">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主聊天区域 -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="chat-title">
+                        <h2 id="chatTitle">AI助手</h2>
+                        <span class="chat-status">
+                            <i class="fas fa-circle"></i>
+                            在线
+                        </span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="action-btn" onclick="toggleChatInfo()" title="对话信息">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="action-btn" onclick="clearCurrentChat()" title="清除对话">
+                        <i class="fas fa-broom"></i>
+                    </button>
+                    <button class="action-btn" onclick="exportChat()" title="导出对话">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-section">
+                    <div class="welcome-avatar">
+                        <div class="ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                    </div>
+                    <div class="welcome-content">
+                        <h3>欢迎使用AI聊天室</h3>
+                        <p>我是您的AI智能助手，基于先进的大语言模型</p>
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="sendQuickMessage('你好，请介绍一下自己')">
+                                <i class="fas fa-hand-wave"></i>
+                                <span>打个招呼</span>
+                            </button>
+                            <button class="quick-btn" onclick="sendQuickMessage('今天天气怎么样？')">
+                                <i class="fas fa-cloud-sun"></i>
+                                <span>天气查询</span>
+                            </button>
+                            <button class="quick-btn" onclick="sendQuickMessage('帮我写一首诗')">
+                                <i class="fas fa-feather"></i>
+                                <span>创意写作</span>
+                            </button>
+                            <button class="quick-btn" onclick="sendQuickMessage('解释一下人工智能')">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>知识问答</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <div class="input-actions-left">
+                            <button class="action-btn" onclick="attachFile()" title="附件">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button class="action-btn" onclick="insertEmoji()" title="表情">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                        </div>
+                        <textarea
+                            id="messageInput"
+                            placeholder="输入您的消息... (Ctrl+Enter发送)"
+                            rows="1"
+                            maxlength="2000"></textarea>
+                        <div class="input-actions-right">
+                            <button class="action-btn voice-btn" onclick="toggleVoiceInput()" title="语音输入">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="send-btn" onclick="sendMessage()" title="发送消息">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-footer">
+                        <span class="char-count">0/2000</span>
+                        <div class="input-hints">
+                            <span class="hint">AI可能会产生错误信息</span>
+                            <span class="divider">•</span>
+                            <span class="hint">请注意核实重要信息</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天信息面板 -->
+        <div class="chat-info-panel" id="chatInfoPanel">
+            <div class="panel-header">
+                <h3>对话信息</h3>
+                <button class="close-btn" onclick="toggleChatInfo()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="panel-content">
+                <div class="info-section">
+                    <h4>当前对话</h4>
+                    <div class="info-item">
+                        <span class="label">标题:</span>
+                        <span class="value" id="currentChatTitle">新对话</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">消息数:</span>
+                        <span class="value" id="messageCount">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">创建时间:</span>
+                        <span class="value" id="chatCreateTime">-</span>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <h4>AI模型</h4>
+                    <div class="model-info">
+                        <div class="model-name">Qwen2.5-72B</div>
+                        <div class="model-provider">硅基流动</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人资料模态框 -->
+    <div class="modal-overlay" id="profileModalOverlay">
+        <div class="modal profile-modal">
+            <div class="modal-header">
+                <h3>个人资料</h3>
+                <button class="close-btn" onclick="closeProfileModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="avatar-section">
+                    <div class="avatar-preview">
+                        <img id="avatarPreview" src="" alt="头像预览" class="avatar-img">
+                        <button class="avatar-change-btn" onclick="changeAvatar()">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                </div>
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="profileUsername" placeholder="输入用户名" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="profileEmail" placeholder="输入邮箱" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <input type="text" id="profileNickname" placeholder="输入昵称">
+                    </div>
+                    <div class="form-group">
+                        <label>个人简介</label>
+                        <textarea id="profileBio" placeholder="介绍一下自己..." rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn secondary" onclick="closeProfileModal()">取消</button>
+                    <button class="btn primary" onclick="saveProfile()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div class="modal-overlay" id="settingsModalOverlay">
+        <div class="modal settings-modal">
+            <div class="modal-header">
+                <h3>设置</h3>
+                <button class="close-btn" onclick="closeSettingsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="settings-tabs">
+                    <button class="tab-btn active" onclick="switchTab('general')">通用</button>
+                    <button class="tab-btn" onclick="switchTab('appearance')">外观</button>
+                    <button class="tab-btn" onclick="switchTab('ai')">AI设置</button>
+                </div>
+                <div class="settings-content">
+                    <div class="tab-content active" id="generalTab">
+                        <div class="setting-item">
+                            <label>自动保存对话</label>
+                            <div class="switch">
+                                <input type="checkbox" id="autoSave" checked>
+                                <span class="slider"></span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>发送快捷键</label>
+                            <select id="shortcutKey">
+                                <option value="ctrl+enter">Ctrl + Enter</option>
+                                <option value="enter">Enter</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>消息时间显示</label>
+                            <div class="switch">
+                                <input type="checkbox" id="showTime" checked>
+                                <span class="slider"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="appearanceTab">
+                        <div class="setting-item">
+                            <label>主题模式</label>
+                            <select id="themeMode">
+                                <option value="dark">深色模式</option>
+                                <option value="light">浅色模式</option>
+                                <option value="auto">跟随系统</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>字体大小</label>
+                            <select id="fontSize">
+                                <option value="small">小</option>
+                                <option value="medium">中</option>
+                                <option value="large">大</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>紧凑模式</label>
+                            <div class="switch">
+                                <input type="checkbox" id="compactMode">
+                                <span class="slider"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="aiTab">
+                        <div class="setting-item">
+                            <label>AI回复速度</label>
+                            <select id="aiSpeed">
+                                <option value="fast">快速</option>
+                                <option value="balanced">平衡</option>
+                                <option value="creative">创意</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>上下文长度</label>
+                            <select id="contextLength">
+                                <option value="short">短 (4K)</option>
+                                <option value="medium">中 (8K)</option>
+                                <option value="long">长 (16K)</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>流式输出</label>
+                            <div class="switch">
+                                <input type="checkbox" id="streamOutput" checked>
+                                <span class="slider"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn secondary" onclick="closeSettingsModal()">取消</button>
+                    <button class="btn primary" onclick="saveSettings()">保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/chat.js"></script>
+</body>
+</html>
