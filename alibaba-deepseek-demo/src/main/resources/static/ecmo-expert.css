@@ -1,0 +1,1153 @@
+/* ECMO诊疗专家系统样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 头部样式 */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c5aa0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info span {
+    color: #666;
+    font-weight: 500;
+}
+
+.btn-logout {
+    padding: 0.5rem 1rem;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: #ff3742;
+    transform: translateY(-1px);
+}
+
+/* 主内容区域 */
+.main-content {
+    display: flex;
+    flex: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* 侧边栏 */
+.sidebar {
+    width: 280px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    height: fit-content;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 2rem;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.nav-item:hover {
+    background: #f8f9fa;
+    color: #2c5aa0;
+    transform: translateX(4px);
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, #2c5aa0, #3b82f6);
+    color: white;
+    box-shadow: 0 4px 15px rgba(44, 90, 160, 0.3);
+}
+
+/* 内容区域 */
+.content {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c5aa0;
+    margin-bottom: 0.5rem;
+}
+
+.section-desc {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* 表单样式 */
+.assessment-form, .quick-form {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.form-group-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.form-group-section h3 {
+    color: #2c5aa0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0, #3b82f6);
+    color: white;
+    box-shadow: 0 4px 15px rgba(44, 90, 160, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(44, 90, 160, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 3% auto;
+    padding: 0;
+    border-radius: 20px;
+    width: 95%;
+    max-width: 1200px; /* 扩大最大宽度 */
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+    animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+}
+
+.modal-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 0;
+    max-height: 75vh;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* 评估结果整体容器 */
+.result-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    margin: 0;
+}
+
+/* 结果头部 - 水平布局优化 */
+.result-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+    margin-bottom: 0;
+}
+
+/* 诊断结果区域 */
+.diagnosis-result {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.diagnosis-result h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    line-height: 1.2;
+}
+
+.diagnosis-result p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 0.95;
+    background: rgba(255,255,255,0.1);
+    padding: 1rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+/* 风险评分可视化区域 */
+.risk-score-visual {
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.risk-score-visual h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    text-align: center;
+}
+
+/* 风险进度条 */
+.risk-progress-container {
+    margin-bottom: 1rem;
+}
+
+.risk-progress-bar {
+    position: relative;
+    height: 24px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.risk-progress-fill {
+    height: 100%;
+    border-radius: 12px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.risk-score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    z-index: 2;
+}
+
+/* 风险等级指示器 */
+.risk-level-indicators {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.risk-indicator {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.risk-indicator.red { border-left: 3px solid #ff6b6b; }
+.risk-indicator.yellow { border-left: 3px solid #ffa502; }
+.risk-indicator.green { border-left: 3px solid #2ed573; }
+
+/* 风险等级徽章 */
+.risk-level-badge {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.risk-level-badge.green {
+    background: linear-gradient(135deg, #2ed573, #17c0eb);
+    border-color: rgba(46,213,115,0.3);
+}
+.risk-level-badge.yellow {
+    background: linear-gradient(135deg, #ffa502, #ff6348);
+    border-color: rgba(255,165,2,0.3);
+}
+.risk-level-badge.red {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    border-color: rgba(255,107,107,0.3);
+}
+
+/* 关键风险因素 */
+.key-risk-factors {
+    margin-top: 1rem;
+}
+
+.key-risk-factors h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    text-align: center;
+}
+
+.key-risk-factors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.key-risk-factors li {
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.25rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    backdrop-filter: blur(5px);
+}
+
+/* 主要内容区域 - 网格布局 */
+.result-main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: white;
+}
+
+/* 4个核心输出 */
+.core-outputs {
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
+    border-right: 1px solid #e0e6ed;
+}
+
+.core-outputs h3 {
+    color: #2d3436;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #6c5ce7;
+}
+
+.output-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border-left: 4px solid #6c5ce7;
+    transition: all 0.3s ease;
+}
+
+.output-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.output-card h4 {
+    color: #2d3436;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.output-card p {
+    color: #636e72;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* 置信度显示 */
+.confidence-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.confidence-bar {
+    flex: 1;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: all 0.8s ease;
+}
+
+.confidence-display span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2d3436;
+    min-width: 45px;
+}
+
+/* 决策支持区域 */
+.decision-support-area {
+    padding: 2rem;
+    background: linear-gradient(135deg, #fff8e6 0%, #fff2cc 100%);
+}
+
+.decision-support-area h3 {
+    color: #2d3436;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #fdcb6e;
+}
+
+/* 决策辅助卡 */
+.decision-support {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.support-section, .oppose-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+}
+
+.support-section:hover, .oppose-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+.support-section {
+    border-left: 4px solid #00b894;
+}
+
+.oppose-section {
+    border-left: 4px solid #e17055;
+}
+
+.support-section h4, .oppose-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.support-section h4 { color: #00b894; }
+.oppose-section h4 { color: #e17055; }
+
+.support-section ul, .oppose-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.support-section li, .oppose-section li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f3f4;
+    color: #636e72;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.support-section li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #00b894;
+    font-weight: 700;
+}
+
+.oppose-section li:before {
+    content: "!";
+    position: absolute;
+    left: 0;
+    color: #e17055;
+    font-weight: 700;
+}
+
+.support-section li:last-child, .oppose-section li:last-child {
+    border-bottom: none;
+}
+
+/* 详细信息区域 - 全宽 */
+.detailed-info {
+    grid-column: 1 / -1;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+    border-top: 1px solid #e0e6ed;
+}
+
+/* 建议措施 */
+.recommendations {
+    margin-bottom: 2rem;
+}
+
+.recommendations h4 {
+    color: #2d3436;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.recommendations ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.recommendations li {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-left: 3px solid #74b9ff;
+    color: #636e72;
+    line-height: 1.5;
+}
+
+/* 指南引用和详细评分 */
+.guidelines, .detailed-scores {
+    margin-bottom: 2rem;
+}
+
+.guidelines h4, .detailed-scores h4 {
+    color: #2d3436;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.guideline-item {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-left: 3px solid #a29bfe;
+}
+
+.guideline-item strong {
+    color: #2d3436;
+}
+
+.scores-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.score-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 3px solid #fd79a8;
+}
+
+.score-label {
+    color: #636e72;
+    font-weight: 500;
+}
+
+.score-value {
+    color: #2d3436;
+    font-weight: 700;
+}
+
+/* ECMO诊疗数据库样式 */
+.knowledge-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 数据库分类卡片 */
+.knowledge-category {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.knowledge-category:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.category-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    color: white;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.category-header h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.category-header p {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.category-content {
+    background: white;
+    padding: 2rem;
+}
+
+/* 数据项网格布局 */
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.data-item {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-left: 4px solid #6c5ce7;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.data-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-left-color: #a29bfe;
+}
+
+.data-item h4 {
+    color: #2d3436;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.data-item .icon {
+    width: 20px;
+    height: 20px;
+    background: #6c5ce7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.data-item p, .data-item ul {
+    color: #636e72;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.data-item ul {
+    list-style: none;
+    padding: 0;
+}
+
+.data-item li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(108, 92, 231, 0.1);
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.data-item li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #6c5ce7;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.data-item li:last-child {
+    border-bottom: none;
+}
+
+/* 重要提示框 */
+.knowledge-alert {
+    background: linear-gradient(135deg, #ff7675 0%, #e17055 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    border-left: 4px solid #d63031;
+    box-shadow: 0 4px 15px rgba(255, 118, 117, 0.3);
+}
+
+.knowledge-alert h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.knowledge-alert p {
+    margin: 0;
+    opacity: 0.95;
+    line-height: 1.5;
+}
+
+/* 成功提示框 */
+.knowledge-success {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    border-left: 4px solid #00a085;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+}
+
+.knowledge-success h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 参数表格样式 */
+.parameter-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.parameter-table th {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.parameter-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f3f4;
+    color: #636e72;
+    font-size: 0.9rem;
+}
+
+.parameter-table tr:hover td {
+    background: #f8f9ff;
+}
+
+.parameter-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 统计数据展示 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .modal-content {
+        width: 98%;
+        max-width: 95vw;
+    }
+
+    .result-header {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .result-main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .core-outputs {
+        border-right: none;
+        border-bottom: 1px solid #e0e6ed;
+    }
+
+    .knowledge-content {
+        grid-template-columns: 1fr;
+    }
+
+    .data-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 1% auto;
+        max-height: 98vh;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+    }
+
+    .result-summary {
+        padding: 1.5rem;
+    }
+
+    .core-outputs, .decision-support-area, .detailed-info {
+        padding: 1.5rem;
+    }
+
+    .recommendations ul {
+        grid-template-columns: 1fr;
+    }
+
+    .scores-breakdown {
+        grid-template-columns: 1fr;
+    }
+
+    .category-header {
+        padding: 1.5rem;
+    }
+
+    .category-content {
+        padding: 1.5rem;
+    }
+
+    .data-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 加载动画 */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 成功/错误状态 */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}

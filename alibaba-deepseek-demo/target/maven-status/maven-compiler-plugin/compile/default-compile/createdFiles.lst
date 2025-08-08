@@ -1,9 +1,8 @@
+com\fox\alibabadeepseekdemo\controller\UserController.class
+com\fox\alibabadeepseekdemo\repository\UserRepository.class
+com\fox\alibabadeepseekdemo\service\UserService.class
 com\fox\alibabadeepseekdemo\entity\User.class
 com\fox\alibabadeepseekdemo\config\ChatConfig.class
 com\fox\alibabadeepseekdemo\controller\PageController.class
 com\fox\alibabadeepseekdemo\controller\ChatController.class
-com\fox\alibabadeepseekdemo\controller\UserController.class
-com\fox\alibabadeepseekdemo\repository\UserRepository.class
-com\fox\alibabadeepseekdemo\service\UserService.class
 com\fox\alibabadeepseekdemo\AlibabaDeepseekDemoApplication.class
-com\fox\alibabadeepseekdemo\controller\ChatController$1.class

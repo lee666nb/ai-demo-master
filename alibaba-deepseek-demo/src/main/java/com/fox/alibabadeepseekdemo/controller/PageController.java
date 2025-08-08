@@ -13,16 +13,26 @@ public class PageController {
 
     @GetMapping("/login")
     public String loginPage() {
-        return "forward:/login.html";
+        return "forward:/static/login.html";
     }
 
     @GetMapping("/register")
     public String registerPage() {
-        return "forward:/register.html";
+        return "forward:/static/register.html";
     }
 
     @GetMapping("/chat")
     public String chatPage() {
-        return "forward:/chat.html";
+        return "forward:/static/chat.html";
+    }
+
+    @GetMapping("/ecmo")
+    public String ecmoPage() {
+        return "forward:/static/ecmo-expert.html";
+    }
+
+    @GetMapping("/ecmo-expert")
+    public String ecmoExpertPage() {
+        return "forward:/static/ecmo-expert.html";
     }
 }

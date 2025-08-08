@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECMO诊疗专家系统</title>
+    <link rel="stylesheet" href="/static/ecmo-expert.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="icon-heart"></i> ECMO诊疗专家系统</h1>
+                <div class="user-info">
+                    <span id="username">医生用户</span>
+                    <button class="btn-logout" onclick="logout()">退出</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-item active" onclick="showSection('assessment')">
+                        <i class="icon-stethoscope"></i>
+                        ECMO评估
+                    </button>
+                    <button class="nav-item" onclick="showSection('history')">
+                        <i class="icon-history"></i>
+                        评估历史
+                    </button>
+                    <button class="nav-item" onclick="showSection('knowledge')">
+                        <i class="icon-book"></i>
+                        知识库
+                    </button>
+                    <button class="nav-item" onclick="showSection('quick')">
+                        <i class="icon-zap"></i>
+                        快速评估
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- 内容区域 -->
+            <main class="content">
+                <!-- ECMO评估页面 -->
+                <div id="assessment-section" class="section active">
+                    <div class="section-header">
+                        <h2>ECMO适应症评估</h2>
+                        <p class="section-desc">请填写患者的详细参数进行专业ECMO评估</p>
+                    </div>
+
+                    <form id="ecmo-form" class="assessment-form">
+                        <!-- 基本信息 -->
+                        <div class="form-group-section">
+                            <h3>基本信息</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="patientId">患者ID</label>
+                                    <input type="text" id="patientId" name="patientId" placeholder="自动生成或手动输入">
+                                </div>
+                                <div class="form-group">
+                                    <label for="age">年龄 *</label>
+                                    <input type="number" id="age" name="age" required min="0" max="120">
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender">性别 *</label>
+                                    <select id="gender" name="gender" required>
+                                        <option value="">请选择</option>
+                                        <option value="男">男</option>
+                                        <option value="女">女</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="weight">体重 (kg) *</label>
+                                    <input type="number" id="weight" name="weight" required min="1" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="height">身高 (cm)</label>
+                                    <input type="number" id="height" name="height" min="50" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 生命体征 -->
+                        <div class="form-group-section">
+                            <h3>生命体征</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="heartRate">心率 (次/分) *</label>
+                                    <input type="number" id="heartRate" name="heartRate" required min="30" max="200">
+                                </div>
+                                <div class="form-group">
+                                    <label for="systolicBP">收缩压 (mmHg) *</label>
+                                    <input type="number" id="systolicBP" name="systolicBP" required min="50" max="250">
+                                </div>
+                                <div class="form-group">
+                                    <label for="diastolicBP">舒张压 (mmHg) *</label>
+                                    <input type="number" id="diastolicBP" name="diastolicBP" required min="30" max="150">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="temperature">体温 (°C)</label>
+                                    <input type="number" id="temperature" name="temperature" min="30" max="45" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="respiratoryRate">呼吸频率 (次/分) *</label>
+                                    <input type="number" id="respiratoryRate" name="respiratoryRate" required min="5" max="60">
+                                </div>
+                                <div class="form-group">
+                                    <label for="oxygenSaturation">血氧饱和度 (%) *</label>
+                                    <input type="number" id="oxygenSaturation" name="oxygenSaturation" required min="50" max="100" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 血气分析 -->
+                        <div class="form-group-section">
+                            <h3>血气分析</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="ph">pH *</label>
+                                    <input type="number" id="ph" name="ph" required min="6.8" max="7.8" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pco2">PCO2 (mmHg) *</label>
+                                    <input type="number" id="pco2" name="pco2" required min="10" max="100" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="po2">PO2 (mmHg) *</label>
+                                    <input type="number" id="po2" name="po2" required min="30" max="500" step="0.1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="hco3">HCO3- (mEq/L)</label>
+                                    <input type="number" id="hco3" name="hco3" min="5" max="40" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lactate">乳酸 (mmol/L) *</label>
+                                    <input type="number" id="lactate" name="lactate" required min="0.5" max="20" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 心脏功能 -->
+                        <div class="form-group-section">
+                            <h3>心脏功能</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="ejectionFraction">射血分数 (%) *</label>
+                                    <input type="number" id="ejectionFraction" name="ejectionFraction" required min="10" max="80" step="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="troponinI">肌钙蛋白I (ng/mL)</label>
+                                    <input type="number" id="troponinI" name="troponinI" min="0" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bnp">BNP (pg/mL)</label>
+                                    <input type="number" id="bnp" name="bnp" min="0" step="1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="ecgFindings">心电图表现</label>
+                                    <input type="text" id="ecgFindings" name="ecgFindings" placeholder="如：窦性心动过速、ST段压低等">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 临床状况 -->
+                        <div class="form-group-section">
+                            <h3>临床状况</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="glasgowComaScale">GCS评分 *</label>
+                                    <input type="number" id="glasgowComaScale" name="glasgowComaScale" required min="3" max="15">
+                                </div>
+                                <div class="form-group">
+                                    <label for="onVentilator">机械通气</label>
+                                    <select id="onVentilator" name="onVentilator">
+                                        <option value="false">否</option>
+                                        <option value="true">是</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="onVasopressors">血管活性药物</label>
+                                    <select id="onVasopressors" name="onVasopressors">
+                                        <option value="false">否</option>
+                                        <option value="true">是</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="primaryDiagnosis">主要诊断 *</label>
+                                    <input type="text" id="primaryDiagnosis" name="primaryDiagnosis" required placeholder="如：急性心肌梗死、ARDS等">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="clinicalPresentation">临床表现</label>
+                                    <textarea id="clinicalPresentation" name="clinicalPresentation" rows="3" placeholder="患者的主要临床症状和体征"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="resetForm()">重置</button>
+                            <button type="submit" class="btn-primary" id="assess-btn">
+                                <i class="icon-stethoscope"></i>
+                                开始评估
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 评估历史页面 -->
+                <div id="history-section" class="section">
+                    <div class="section-header">
+                        <h2>评估历史</h2>
+                        <p class="section-desc">查看历史ECMO评估记录</p>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <div class="empty-state">
+                            <i class="icon-history"></i>
+                            <p>暂无评估记录</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ECMO诊疗数据库页面 -->
+                <div id="knowledge-section" class="section">
+                    <div class="section-header">
+                        <h2>🏥 ECMO诊疗数据库</h2>
+                        <p class="section-desc">全面的ECMO临床数据、指南标准和诊疗参考</p>
+                    </div>
+                    <div class="knowledge-content">
+                        <!-- 适应症与禁忌症 -->
+                        <div class="knowledge-category">
+                            <div class="category-header">
+                                <h3>📋 适应症与禁忌症</h3>
+                                <p>基于国际权威指南的ECMO使用标准</p>
+                            </div>
+                            <div class="category-content">
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <h4><span class="icon">✓</span>呼吸系统适应症</h4>
+                                        <ul>
+                                            <li>严重ARDS: P/F比 < 80，持续6小时以上</li>
+                                            <li>难治性呼吸衰竭: FiO2 > 90%，PEEP ≥ 15cmH2O</li>
+                                            <li>肺移植术后原发性移植物功能障碍</li>
+                                            <li>支气管胸膜瘘伴严重呼吸衰竭</li>
+                                            <li>严重哮喘持续状态</li>
+                                            <li>肺出血伴呼吸衰竭</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">♥</span>循环系统适应症</h4>
+                                        <ul>
+                                            <li>心源性休克: CI < 2.2L/min/m²</li>
+                                            <li>急性心肌梗死并发心源性休克</li>
+                                            <li>暴发性心肌炎</li>
+                                            <li>心脏术后低心排综合征</li>
+                                            <li>心脏骤停后综合征</li>
+                                            <li>药物中毒致心脏停跳</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">⚠</span>绝对禁忌症</h4>
+                                        <ul>
+                                            <li>不可逆转的疾病终末期</li>
+                                            <li>晚期恶性肿瘤(预期生存期<6个月)</li>
+                                            <li>严重不可逆性脑损伤</li>
+                                            <li>不可控制的出血</li>
+                                            <li>严重免疫缺陷病</li>
+                                            <li>患者/家属拒绝</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">!</span>相对禁忌症</h4>
+                                        <ul>
+                                            <li>年龄 > 75岁</li>
+                                            <li>机械通气 > 7天</li>
+                                            <li>多器官功能衰竭 > 48小时</li>
+                                            <li>不可逆性神经系统疾病</li>
+                                            <li>严重外周血管疾病</li>
+                                            <li>严重肥胖(BMI > 40)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="knowledge-alert">
+                                    <h4>⚠️ 重要提醒</h4>
+                                    <p>ECMO适应症评估需要多学科团队讨论，综合考虑患者的基础疾病、预后、家庭意愿等多方面因素。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 临床参数标准 -->
+                        <div class="knowledge-category">
+                            <div class="category-header">
+                                <h3>📊 临床参数标准</h3>
+                                <p>ECMO评估关键指标的正常值与异常标准</p>
+                            </div>
+                            <div class="category-content">
+                                <table class="parameter-table">
+                                    <thead>
+                                        <tr>
+                                            <th>参数</th>
+                                            <th>正常范围</th>
+                                            <th>ECMO考虑值</th>
+                                            <th>紧急指征值</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>P/F比值</td>
+                                            <td>> 300</td>
+                                            <td>100-150</td>
+                                            <td>< 80</td>
+                                        </tr>
+                                        <tr>
+                                            <td>左室射血分数(%)</td>
+                                            <td>55-70</td>
+                                            <td>20-30</td>
+                                            <td>< 20</td>
+                                        </tr>
+                                        <tr>
+                                            <td>心脏指数(L/min/m²)</td>
+                                            <td>2.5-4.0</td>
+                                            <td>1.8-2.2</td>
+                                            <td>< 1.8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>乳酸(mmol/L)</td>
+                                            <td>0.5-2.2</td>
+                                            <td>4.0-8.0</td>
+                                            <td>> 10</td>
+                                        </tr>
+                                        <tr>
+                                            <td>pH值</td>
+                                            <td>7.35-7.45</td>
+                                            <td>7.20-7.30</td>
+                                            <td>< 7.20</td>
+                                        </tr>
+                                        <tr>
+                                            <td>中心静脉氧饱和度(%)</td>
+                                            <td>65-70</td>
+                                            <td>50-60</td>
+                                            <td>< 50</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <div class="stat-number">24-48h</div>
+                                        <div class="stat-label">最佳启动时机</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-number">70-85%</div>
+                                        <div class="stat-label">成功脱机率</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-number">45-65%</div>
+                                        <div class="stat-label">总体生存率</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-number">3-14天</div>
+                                        <div class="stat-label">平均支持时间</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 并发症管理 -->
+                        <div class="knowledge-category">
+                            <div class="category-header">
+                                <h3>⚕️ 并发症管理</h3>
+                                <p>ECMO常见并发症的预防、识别与处理策略</p>
+                            </div>
+                            <div class="category-content">
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <h4><span class="icon">🩸</span>出血并发症</h4>
+                                        <p><strong>发生率:</strong> 30-50%</p>
+                                        <ul>
+                                            <li>颅内出血: 最严重，发生率3-8%</li>
+                                            <li>胃肠道出血: 常见，需要内镜检查</li>
+                                            <li>插管部位出血: 局部压迫止血</li>
+                                            <li>手术部位出血: 可能需要再次手术</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🧠</span>神经系统并发症</h4>
+                                        <p><strong>发生率:</strong> 10-15%</p>
+                                        <ul>
+                                            <li>脑梗塞: 血栓栓塞所致</li>
+                                            <li>脑出血: 抗凝过度或血小板减少</li>
+                                            <li>癫痫: 脑血流灌注异常</li>
+                                            <li>意识障碍: 多因素导致</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🫀</span>循环系统并发症</h4>
+                                        <p><strong>发生率:</strong> 20-30%</p>
+                                        <ul>
+                                            <li>下肢缺血: 插管侧血流减少</li>
+                                            <li>血栓形成: 回路内凝血激活</li>
+                                            <li>心律失常: 心肌缺血或电解质紊乱</li>
+                                            <li>心包积液: 心脏手术后常见</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🦠</span>感染并发症</h4>
+                                        <p><strong>发生率:</strong> 15-25%</p>
+                                        <ul>
+                                            <li>导管相关血流感染: 最常见</li>
+                                            <li>呼吸机相关肺炎: VAP风险增加</li>
+                                            <li>泌尿系感染: 留置导尿管所致</li>
+                                            <li>手术切口感染: 免疫功能下降</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 权威指南引用 -->
+                        <div class="knowledge-category">
+                            <div class="category-header">
+                                <h3>📚 权威指南引用</h3>
+                                <p>国际国内ECMO相关权威指南与专家共识</p>
+                            </div>
+                            <div class="category-content">
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <h4><span class="icon">🌍</span>ELSO指南 2017版</h4>
+                                        <p>体外生命支持组织(ELSO)制定的国际权威指南，涵盖成人、儿童ECMO的适应症、禁忌症、管理要点等。</p>
+                                        <ul>
+                                            <li>成人呼吸ECMO指南</li>
+                                            <li>成人心脏ECMO指南</li>
+                                            <li>ECMO质量管理标准</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🇨🇳</span>中国ECMO专家共识</h4>
+                                        <p>中国体外膜肺氧合临床应用专家共识(2018版)，结合国情制定的临床应用标准。</p>
+                                        <ul>
+                                            <li>适应症与禁忌症</li>
+                                            <li>团队建设要求</li>
+                                            <li>质量控制标准</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🇪🇺</span>欧洲重症医学会</h4>
+                                        <p>ESICM发布的ECMO在重症患者中的应用指南，强调循证医学证据。</p>
+                                        <ul>
+                                            <li>患者选择标准</li>
+                                            <li>脱机策略</li>
+                                            <li>并发症预防</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🇺🇸</span>美国重症医学会</h4>
+                                        <p>SCCM制定的ECMO临床实践指南，注重多学科团队协作。</p>
+                                        <ul>
+                                            <li>团队培训要求</li>
+                                            <li>设备配置标准</li>
+                                            <li>伦理决策框架</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="knowledge-success">
+                                    <h4>✅ 循证医学证据</h4>
+                                    <p>以上指南均基于大量临床研究和荟萃分析，为ECMO临床应用提供了科学依据。建议临床医生结合患者具体情况，参照相关指南进行决策。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最新研究进展 -->
+                        <div class="knowledge-category">
+                            <div class="category-header">
+                                <h3>🔬 最新研究进展</h3>
+                                <p>ECMO领域的前沿研究与技术发展</p>
+                            </div>
+                            <div class="category-content">
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <h4><span class="icon">💊</span>药物治疗优化</h4>
+                                        <ul>
+                                            <li>ECMO期间药代动力学变化研究</li>
+                                            <li>新型抗凝药物在ECMO中的应用</li>
+                                            <li>镇静镇痛药物的剂量调整策略</li>
+                                            <li>血管活性药物的合理使用</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🤖</span>人工智能应用</h4>
+                                        <ul>
+                                            <li>机器学习预测ECMO成功率</li>
+                                            <li>智能监测系统预警并发症</li>
+                                            <li>自动化参数调节系统</li>
+                                            <li>大数据分析优化治疗方案</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🛠️</span>设备技术创新</h4>
+                                        <ul>
+                                            <li>新型氧合器技术</li>
+                                            <li>微型化ECMO设备</li>
+                                            <li>生物相容性材料应用</li>
+                                            <li>远程监控技术</li>
+                                        </ul>
+                                    </div>
+                                    <div class="data-item">
+                                        <h4><span class="icon">🏥</span>临床管理改进</h4>
+                                        <ul>
+                                            <li>早期活动与康复策略</li>
+                                            <li>营养支持优化方案</li>
+                                            <li>心理支持与家属沟通</li>
+                                            <li>多学科协作模式创新</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快速评估页面 -->
+                <div id="quick-section" class="section">
+                    <div class="section-header">
+                        <h2>快速评估</h2>
+                        <p class="section-desc">基于关键指标的快速ECMO评估</p>
+                    </div>
+                    <form id="quick-form" class="quick-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="quickAge">年龄</label>
+                                <input type="number" id="quickAge" name="age" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="quickGender">性别</label>
+                                <select id="quickGender" name="gender" required>
+                                    <option value="">请选择</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="quickWeight">体重(kg)</label>
+                                <input type="number" id="quickWeight" name="weight" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="quickPo2">PO2(mmHg)</label>
+                                <input type="number" id="quickPo2" name="po2" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="quickSpo2">血氧饱和度(%)</label>
+                                <input type="number" id="quickSpo2" name="oxygenSaturation" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="quickEf">射血分数(%)</label>
+                                <input type="number" id="quickEf" name="ejectionFraction" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="quickLactate">乳酸(mmol/L)</label>
+                                <input type="number" id="quickLactate" name="lactate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="quickDiagnosis">主要诊断</label>
+                                <input type="text" id="quickDiagnosis" name="primaryDiagnosis" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary" id="quick-assess-btn">
+                                <i class="icon-zap"></i>
+                                快速评估
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- 快速评估结果 -->
+                    <div id="quick-result" class="assessment-result" style="display: none;">
+                        <h3>快速评估结果</h3>
+                        <div id="quick-result-content"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 评估结果模态框 -->
+    <div id="result-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ECMO评估结果</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 评估结果内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">关闭</button>
+                <button class="btn-primary" onclick="saveAssessment()">保存结果</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评估结果模板 -->
+    <div id="result-template" style="display: none;">
+        <div class="result-summary">
+            <div class="result-header">
+                <div class="diagnosis-result">
+                    <h3 id="ecmo-recommendation">ECMO诊断结果</h3>
+                    <p id="diagnosis-text">诊断原因</p>
+                </div>
+                <!-- 动态风险评分可视化 -->
+                <div class="risk-score-visual">
+                    <h4>ECMO实施推荐指数</h4>
+                    <div class="risk-progress-container">
+                        <div class="risk-progress-bar">
+                            <div id="risk-progress-fill" class="risk-progress-fill"></div>
+                            <div class="risk-score-text">
+                                <span id="risk-score-value">0</span>/100
+                            </div>
+                        </div>
+                        <div class="risk-level-indicators">
+                            <span class="risk-indicator red">不推荐 (0-59)</span>
+                            <span class="risk-indicator yellow">谨慎 (60-79)</span>
+                            <span class="risk-indicator green">推荐 (80-100)</span>
+                        </div>
+                    </div>
+                    <div id="risk-level-badge" class="risk-level-badge">风险等级</div>
+
+                    <!-- 关键扣分点 -->
+                    <div class="key-risk-factors">
+                        <h5>关键风险因素</h5>
+                        <ul id="key-risk-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 - 优化布局 -->
+        <div class="result-main-content">
+            <!-- 4个核心输出 -->
+            <div class="core-outputs">
+                <h3>📊 核心评估结果</h3>
+
+                <div class="output-card">
+                    <h4>📋 诊断依据</h4>
+                    <p id="evidence-text"></p>
+                </div>
+
+                <div class="output-card">
+                    <h4>🎯 置信度评估</h4>
+                    <div class="confidence-display">
+                        <div class="confidence-bar">
+                            <div id="confidence-fill" class="confidence-fill"></div>
+                        </div>
+                        <span id="confidence-value">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 决策支持区域 -->
+            <div class="decision-support-area">
+                <h3>⚖️ 决策辅助分析</h3>
+
+                <!-- 决策辅助卡 -->
+                <div class="decision-support">
+                    <div class="support-section">
+                        <h4>✅ 支持使用依据</h4>
+                        <ul id="support-reasons-list"></ul>
+                    </div>
+
+                    <div class="oppose-section">
+                        <h4>⚠️ 风险注意事项</h4>
+                        <ul id="oppose-reasons-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细信息区域 - 全宽显示 -->
+        <div class="detailed-info">
+            <!-- 详细建议 -->
+            <div class="recommendations">
+                <h4>💡 临床建议措施</h4>
+                <ul id="recommendations-list"></ul>
+            </div>
+
+            <!-- 专家共识引用 -->
+            <div class="guidelines">
+                <h4>📚 权威指南参考</h4>
+                <div id="guidelines-list"></div>
+            </div>
+
+            <!-- 详细评分 -->
+            <div class="detailed-scores">
+                <h4>📊 详细评分分析</h4>
+                <div id="scores-breakdown" class="scores-breakdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/ecmo-expert.js"></script>
+    <script>
+        // 全局函数
+        function showSection(section) {
+            window.ecmoSystem.showSection(section);
+        }
+
+        function resetForm() {
+            document.getElementById('ecmo-form').reset();
+            window.ecmoSystem.setDefaultValues();
+        }
+
+        function closeModal() {
+            window.ecmoSystem.closeModal();
+        }
+
+        function saveAssessment() {
+            window.ecmoSystem.saveCurrentAssessment();
+        }
+
+        function deleteAssessment(assessmentId) {
+            window.ecmoSystem.deleteAssessment(assessmentId);
+        }
+
+        function logout() {
+            localStorage.removeItem('username');
+            window.location.href = '/static/login.html';
+        }
+
+        // 初始化系统
+        window.addEventListener('DOMContentLoaded', () => {
+            window.ecmoSystem = new ECMOExpertSystem();
+        });
+    </script>
+</body>
+</html>

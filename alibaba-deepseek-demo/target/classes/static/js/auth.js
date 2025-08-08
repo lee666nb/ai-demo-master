@@ -98,11 +98,11 @@ class AuthManager {
                 this.saveUserSession(result, rememberMe);
 
                 // 显示成功消息
-                this.showMessage('登录成功！正在跳转...', 'success');
+                this.showMessage('登录成功！正在跳转到ECMO诊疗专家系统...', 'success');
 
-                // 延迟跳转到聊天页面
+                // 延迟跳转到ECMO诊疗专家系统
                 setTimeout(() => {
-                    window.location.href = '/chat';
+                    window.location.href = '/ecmo-expert';
                 }, 1500);
             } else {
                 this.showMessage(result.message || '登录失败，请检查用户名和密码', 'error');

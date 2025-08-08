@@ -14,14 +14,10 @@ spring:
 
   # MVC配置
   mvc:
-    static-path-pattern: /**
-    view:
-      prefix: /
-      suffix: .html
+    static-path-pattern: /static/**
 
   ai:
     openai:
-        # 这写你自己的api！
       api-key: sk-yrihxgdcfjrhjdzknhyteeblftqshdrcphjzehnljshiiipu
       base-url: https://api.siliconflow.cn
       chat:
@@ -32,3 +28,5 @@ spring:
 logging:
   level:
     com.fox.alibabadeepseekdemo: DEBUG
+    web: DEBUG
+    org.springframework.web: DEBUG
