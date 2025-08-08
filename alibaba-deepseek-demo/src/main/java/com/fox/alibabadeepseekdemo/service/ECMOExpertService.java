@@ -133,14 +133,14 @@ public class ECMOExpertService {
      */
     private String buildECMOAssessmentPrompt(PatientParameters patient, Double riskScore) {
         StringBuilder prompt = new StringBuilder();
-
+        
         prompt.append("作为ECMO领域的国际顶级专家，请基于ELSO指南、中国ECMO专家共识等权威标准，对以下患者进行全面的ECMO适应症评估。\n\n");
-
+        
         prompt.append("【患者临床资料】\n");
         prompt.append("患者ID: ").append(patient.getPatientId()).append("\n");
         prompt.append("年龄: ").append(patient.getAge() != null ? patient.getAge() + "岁" : "未提供").append("\n");
         prompt.append("性别: ").append(patient.getGender() != null ? patient.getGender() : "未提供").append("\n");
-
+        
         prompt.append("\n【生命体征监测】\n");
         if (patient.getHeartRate() != null) prompt.append("心率: ").append(patient.getHeartRate()).append("次/分\n");
         if (patient.getSystolicBP() != null && patient.getDiastolicBP() != null) {
@@ -148,7 +148,7 @@ public class ECMOExpertService {
         }
         if (patient.getOxygenSaturation() != null) prompt.append("血氧饱和度: ").append(patient.getOxygenSaturation()).append("%\n");
         if (patient.getRespiratoryRate() != null) prompt.append("呼吸频率: ").append(patient.getRespiratoryRate()).append("次/分\n");
-
+        
         prompt.append("\n【动脉血气分析】\n");
         if (patient.getpH() != null) prompt.append("pH值: ").append(patient.getpH()).append("\n");
         if (patient.getPaO2() != null) prompt.append("PaO2: ").append(patient.getPaO2()).append("mmHg\n");
@@ -156,24 +156,24 @@ public class ECMOExpertService {
         if (patient.getpO2FiO2Ratio() != null) prompt.append("P/F比值(氧合指数): ").append(patient.getpO2FiO2Ratio()).append("\n");
         if (patient.getLactate() != null) prompt.append("血乳酸: ").append(patient.getLactate()).append("mmol/L\n");
         if (patient.getBicarbonate() != null) prompt.append("碳酸氢根: ").append(patient.getBicarbonate()).append("mmol/L\n");
-
+        
         prompt.append("\n【心肺功能评估】\n");
         if (patient.getEjectionFraction() != null) prompt.append("左室射血分数(LVEF): ").append(patient.getEjectionFraction()).append("%\n");
         if (patient.getCardiacIndex() != null) prompt.append("心脏指数: ").append(patient.getCardiacIndex()).append("\n");
-
+        
         prompt.append("\n【疾病诊断及病程】\n");
         if (patient.getPrimaryDiagnosis() != null) prompt.append("主要诊断: ").append(patient.getPrimaryDiagnosis()).append("\n");
         if (patient.getSecondaryDiagnosis() != null) prompt.append("次要诊断: ").append(patient.getSecondaryDiagnosis()).append("\n");
         if (patient.getIllnessDuration() != null) prompt.append("病程时间: ").append(patient.getIllnessDuration()).append("天\n");
         if (patient.getComorbidities() != null) prompt.append("合并疾病: ").append(patient.getComorbidities()).append("\n");
         if (patient.getCurrentTreatment() != null) prompt.append("当前治疗: ").append(patient.getCurrentTreatment()).append("\n");
-
+        
         prompt.append("\n【实验室检查】\n");
         if (patient.getHemoglobin() != null) prompt.append("血红蛋白: ").append(patient.getHemoglobin()).append("g/L\n");
         if (patient.getPlateletCount() != null) prompt.append("血小板: ").append(patient.getPlateletCount()).append("×10⁹/L\n");
         if (patient.getCreatinine() != null) prompt.append("肌酐: ").append(patient.getCreatinine()).append("μmol/L\n");
         if (patient.getBilirubin() != null) prompt.append("胆红素: ").append(patient.getBilirubin()).append("μmol/L\n");
-
+        
         prompt.append("\n【系统风险评分】\n");
         prompt.append("ECMO实施推荐指数: ").append(String.format("%.1f", riskScore)).append("/100分\n");
         if (riskScore >= 80) {
@@ -183,11 +183,11 @@ public class ECMOExpertService {
         } else {
             prompt.append("风险等级: 低推荐 (红色区间)\n");
         }
-
+        
         prompt.append("\n【评估任务要求】\n");
         prompt.append("请作为ECMO专家，结合患者的临床资料和系统评分，提供专业的ECMO适应症评估。\n");
         prompt.append("必须严格按照以下JSON格式返回详细的评估结果，不得省略任何字段：\n\n");
-
+        
         prompt.append("```json\n");
         prompt.append("{\n");
         prompt.append("  \"canUseECMO\": true,\n");
@@ -213,13 +213,13 @@ public class ECMOExpertService {
         prompt.append("  \"precautions\": \"详细的注意事项和风险防控措施\"\n");
         prompt.append("}\n");
         prompt.append("```\n");
-
+        
         prompt.append("\n【重要提醒】\n");
         prompt.append("1. 所有文字描述必须详细、专业、具有临床指导价值\n");
         prompt.append("2. 支持理由和反对理由都必须基于具体的临床证据\n");
         prompt.append("3. 建议措施要具体可操作，符合临床实际\n");
         prompt.append("4. 必须严格按照JSON格式输出，不要添加其他解释文字\n");
-
+        
         return prompt.toString();
     }
 
@@ -230,7 +230,7 @@ public class ECMOExpertService {
         ECMOAssessment assessment = new ECMOAssessment();
         assessment.setPatientId(patientId);
         assessment.setRiskScore(riskScore);
-
+        
         try {
             // 尝试解析JSON响应
             String cleanResponse = aiResponse.trim();
@@ -240,7 +240,7 @@ public class ECMOExpertService {
             if (cleanResponse.endsWith("```")) {
                 cleanResponse = cleanResponse.substring(0, cleanResponse.length() - 3);
             }
-
+            
             // 解析核心字段
             assessment.setCanUseECMO(cleanResponse.contains("\"canUseECMO\": true"));
             assessment.setDiagnosis(extractValue(cleanResponse, "diagnosis"));
@@ -249,29 +249,29 @@ public class ECMOExpertService {
             assessment.setFinalRecommendation(extractValue(cleanResponse, "finalRecommendation"));
             assessment.setContraindications(extractValue(cleanResponse, "contraindications"));
             assessment.setPrecautions(extractValue(cleanResponse, "precautions"));
-
+            
             // 解析支持和反对理由
             List<String> supportReasons = extractArrayValue(cleanResponse, "supportReasons");
             List<String> opposeReasons = extractArrayValue(cleanResponse, "opposeReasons");
             List<String> recommendations = extractArrayValue(cleanResponse, "recommendations");
-
+            
             assessment.setSupportReasons(supportReasons);
             assessment.setOpposeReasons(opposeReasons);
             assessment.setRecommendations(recommendations);
-
+            
         } catch (Exception e) {
             // 如果解析失败，使用基于风险评分的默认值
             assessment = createDefaultAssessment(patientId, riskScore);
         }
-
+        
         // 如果关键字段为空，使用默认值
         if (assessment.getDiagnosis() == null || assessment.getDiagnosis().equals("未提供") || assessment.getDiagnosis().equals("解析错误")) {
             assessment = createDefaultAssessment(patientId, riskScore);
         }
-
+        
         return assessment;
     }
-
+    
     /**
      * 创建基于风险评分的默认评估结果
      */
@@ -279,11 +279,11 @@ public class ECMOExpertService {
         ECMOAssessment assessment = new ECMOAssessment();
         assessment.setPatientId(patientId);
         assessment.setRiskScore(riskScore);
-
+        
         // 根据风险评分确定推荐结果
         boolean recommend = riskScore >= 60;
         assessment.setCanUseECMO(recommend);
-
+        
         // 设置诊断信息
         if (riskScore >= 80) {
             assessment.setDiagnosis("患者临床指标符合ECMO适应症，系统综合评估后强烈推荐使用ECMO治疗");
@@ -301,7 +301,7 @@ public class ECMOExpertService {
             assessment.setFinalRecommendation("不推荐使用");
             assessment.setConfidence(0.8);
         }
-
+        
         // 设置支持理由
         List<String> supportReasons = new ArrayList<>();
         if (riskScore >= 80) {
@@ -317,7 +317,7 @@ public class ECMOExpertService {
             supportReasons.add("可考虑其他替代治疗方案");
         }
         assessment.setSupportReasons(supportReasons);
-
+        
         // 设置反对理由
         List<String> opposeReasons = new ArrayList<>();
         if (riskScore < 80) {
@@ -334,7 +334,7 @@ public class ECMOExpertService {
             opposeReasons.add("需要经验丰富的ECMO团队");
         }
         assessment.setOpposeReasons(opposeReasons);
-
+        
         // 设置详细建议
         List<String> recommendations = new ArrayList<>();
         if (riskScore >= 80) {
@@ -353,7 +353,7 @@ public class ECMOExpertService {
             recommendations.add("必要时重新评估ECMO适应症");
         }
         assessment.setRecommendations(recommendations);
-
+        
         // 设置禁忌症和注意事项
         if (riskScore < 60) {
             assessment.setContraindications("年龄过大、不可逆性疾病、严重多器官功能衰竭、活动性出血等");
@@ -362,10 +362,10 @@ public class ECMOExpertService {
             assessment.setContraindications("无绝对禁忌症，需注意相对禁忌症");
             assessment.setPrecautions("严密监测凝血功能、感染指标、器官功能等");
         }
-
+        
         return assessment;
     }
-
+    
     /**
      * 增强风险评估信息
      */
@@ -381,7 +381,7 @@ public class ECMOExpertService {
             assessment.setRiskLevel("不推荐");
             assessment.setRiskColor("red");
         }
-
+        
         // 计算关键风险因素
         List<String> keyRiskFactors = new ArrayList<>();
         if (patient.getAge() != null && patient.getAge() > 70) {
@@ -402,12 +402,12 @@ public class ECMOExpertService {
         if (patient.getCreatinine() != null && patient.getCreatinine() > 300) {
             keyRiskFactors.add("肌酐>300μmol/L(-10分)");
         }
-
+        
         if (keyRiskFactors.isEmpty()) {
             keyRiskFactors.add("暂无显著风险因素");
         }
         assessment.setKeyRiskFactors(keyRiskFactors);
-
+        
         // 设置指南参考
         Map<String, String> guidelines = new HashMap<>();
         guidelines.put("ELSO指南", "体外生命支持组织(ELSO)指南2017版 - 成人心肺ECMO适应症标准");
@@ -415,11 +415,11 @@ public class ECMOExpertService {
         guidelines.put("欧洲指南", "欧洲重症医学会ECMO指南 - 重症心肺衰竭患者管理");
         guidelines.put("美国指南", "美国重症医学会ECMO临床实践指南 - 患者选择标准");
         assessment.setGuidelineReferences(guidelines);
-
+        
         // 设置详细评分
         Map<String, Object> detailedScores = new HashMap<>();
         detailedScores.put("总体推荐指数", String.format("%.1f/100", riskScore));
-
+        
         // 年龄评分
         int ageScore = 100;
         if (patient.getAge() != null) {
@@ -428,7 +428,7 @@ public class ECMOExpertService {
             else if (patient.getAge() < 18) ageScore = 70;
         }
         detailedScores.put("年龄适宜度", ageScore + "/100");
-
+        
         // 心肺功能评分
         int cardiopulmonaryScore = 50;
         if (patient.getpO2FiO2Ratio() != null) {
@@ -439,7 +439,7 @@ public class ECMOExpertService {
             else cardiopulmonaryScore = 30;
         }
         detailedScores.put("心肺功能", cardiopulmonaryScore + "/100");
-
+        
         // 病程评分
         int durationScore = 90;
         if (patient.getIllnessDuration() != null) {
@@ -448,10 +448,10 @@ public class ECMOExpertService {
             else if (patient.getIllnessDuration() > 5) durationScore = 80;
         }
         detailedScores.put("病程时效性", durationScore + "/100");
-
+        
         assessment.setDetailedScores(detailedScores);
     }
-
+    
     /**
      * 创建错误评估结果
      */
@@ -466,7 +466,7 @@ public class ECMOExpertService {
         errorAssessment.setRiskLevel("系统异常");
         errorAssessment.setRiskColor("gray");
         errorAssessment.setFinalRecommendation("请重新评估或咨询ECMO专科医生");
-
+        
         List<String> errorRecommendations = Arrays.asList(
             "检查并完善患者临床数据",
             "重新提交评估请求",
@@ -474,15 +474,15 @@ public class ECMOExpertService {
             "确认网络连接和系统状态"
         );
         errorAssessment.setRecommendations(errorRecommendations);
-
+        
         errorAssessment.setSupportReasons(Arrays.asList("建议人工评估患者情况"));
         errorAssessment.setOpposeReasons(Arrays.asList("系统无法提供可靠评估"));
         errorAssessment.setContraindications("系统故障，无法评估禁忌症");
         errorAssessment.setPrecautions("请立即联系专业医疗团队进行评估");
-
+        
         return errorAssessment;
     }
-
+    
     /**
      * 从文本中提取值
      */
@@ -500,7 +500,7 @@ public class ECMOExpertService {
             return "解析错误，请检查数据格式";
         }
     }
-
+    
     /**
      * 从文本中提取数值
      */
@@ -517,7 +517,7 @@ public class ECMOExpertService {
             return defaultValue;
         }
     }
-
+    
     /**
      * 从文本中提取数组值
      */
@@ -527,7 +527,7 @@ public class ECMOExpertService {
             String pattern = "\"" + key + "\"\\s*:\\s*\\[([^\\]]*?)\\]";
             java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern, java.util.regex.Pattern.DOTALL);
             java.util.regex.Matcher m = p.matcher(text);
-
+            
             if (m.find()) {
                 String arrayContent = m.group(1);
                 // 简单解析数组内容
@@ -539,7 +539,7 @@ public class ECMOExpertService {
                     }
                 }
             }
-
+            
             // 如果解析失败或结果为空，返回默认值
             if (result.isEmpty()) {
                 if (key.equals("supportReasons")) {
@@ -553,12 +553,12 @@ public class ECMOExpertService {
                     result.add("密切监测病情变化");
                 }
             }
-
+            
         } catch (Exception e) {
             // 返回默认值
             result.add("系统解析异常，请人工评估");
         }
-
+        
         return result;
     }
 }

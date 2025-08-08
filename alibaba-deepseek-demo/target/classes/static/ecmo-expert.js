@@ -4,6 +4,7 @@ class ECMOExpertSystem {
         this.currentUser = localStorage.getItem('username') || '医生用户';
         this.currentAssessment = null;
         this.assessmentHistory = JSON.parse(localStorage.getItem('ecmoAssessments') || '[]');
+        this.filteredHistory = []; // 筛选后的历史记录
 
         this.init();
     }
@@ -13,6 +14,7 @@ class ECMOExpertSystem {
         this.bindEvents();
         this.loadKnowledge();
         this.setDefaultValues();
+        this.loadAssessmentHistory(); // 初始化时加载历史记录
     }
 
     updateUsername() {
@@ -50,6 +52,12 @@ class ECMOExpertSystem {
                 e.preventDefault();
                 this.handleQuickAssessment();
             });
+        }
+
+        // 历史记录搜索和筛选事件
+        const historySearch = document.getElementById('history-search');
+        if (historySearch) {
+            historySearch.addEventListener('input', () => this.searchHistory());
         }
 
         // 模态框关闭事件
@@ -127,7 +135,7 @@ class ECMOExpertSystem {
     // 处理完整ECMO评估
     async handleECMOAssessment() {
         const formData = this.getFormData('ecmo-form');
-
+        
         // 显示加载状态
         this.showLoading('正在进行ECMO专业评估...');
 
@@ -141,7 +149,7 @@ class ECMOExpertSystem {
             });
 
             const result = await response.json();
-
+            
             if (result.success) {
                 this.currentAssessment = result;
                 this.displayAssessmentResult(result);
@@ -160,7 +168,7 @@ class ECMOExpertSystem {
     // 处理快速评估（修复快速诊断功能）
     async handleQuickAssessment() {
         const formData = this.getFormData('quick-form');
-
+        
         // 填充必要字段的默认值
         formData.patientId = formData.patientId || `QUICK_${Date.now()}`;
         formData.heartRate = formData.heartRate || 100;
@@ -188,7 +196,7 @@ class ECMOExpertSystem {
             });
 
             const result = await response.json();
-
+            
             if (result.success) {
                 this.displayQuickResult(result);
             } else {
@@ -210,13 +218,13 @@ class ECMOExpertSystem {
     displayQuickResult(result) {
         const quickResultDiv = document.getElementById('quick-result');
         const contentDiv = document.getElementById('quick-result-content');
-
+        
         if (!quickResultDiv || !contentDiv) return;
 
         const riskScore = result.riskAssessment?.riskScore || 0;
         const riskLevel = result.riskAssessment?.riskLevel || '未知';
         const riskColor = result.riskAssessment?.riskColor || 'gray';
-
+        
         contentDiv.innerHTML = `
             <div class="quick-result-summary">
                 <div class="quick-recommendation ${riskColor}">
@@ -244,7 +252,7 @@ class ECMOExpertSystem {
                 </div>
             </div>
         `;
-
+        
         quickResultDiv.style.display = 'block';
         this.currentAssessment = result;
     }
@@ -279,12 +287,12 @@ class ECMOExpertSystem {
         const riskScore = result.riskAssessment?.riskScore || 0;
         const riskLevel = result.riskAssessment?.riskLevel || '未评估';
         const riskColor = result.riskAssessment?.riskColor || 'gray';
-
+        
         // 更新风险评分进度条
         const riskProgressFill = document.getElementById('risk-progress-fill');
         const riskScoreValue = document.getElementById('risk-score-value');
         const riskLevelBadge = document.getElementById('risk-level-badge');
-
+        
         if (riskProgressFill && riskScoreValue && riskLevelBadge) {
             riskProgressFill.style.width = `${riskScore}%`;
             riskProgressFill.style.background = this.getRiskGradientColor(riskScore);
@@ -304,7 +312,7 @@ class ECMOExpertSystem {
         const confidence = (result.confidence || 0) * 100;
         const confidenceFill = document.getElementById('confidence-fill');
         const confidenceValue = document.getElementById('confidence-value');
-
+        
         if (confidenceFill && confidenceValue) {
             confidenceFill.style.width = `${confidence}%`;
             confidenceFill.style.background = this.getConfidenceColor(confidence);
@@ -318,7 +326,7 @@ class ECMOExpertSystem {
 
         // 设置指南引用
         this.populateGuidelines(result.decisionCard?.guidelineReferences || {});
-
+        
         // 设置详细评分
         this.populateDetailedScores(result.detailedScores || {});
     }
@@ -404,8 +412,8 @@ class ECMOExpertSystem {
 
         for (let [key, value] of formData.entries()) {
             // 数值字段转换
-            if (['age', 'weight', 'height', 'heartRate', 'systolicBP', 'diastolicBP',
-                 'temperature', 'respiratoryRate', 'oxygenSaturation', 'ph', 'pco2',
+            if (['age', 'weight', 'height', 'heartRate', 'systolicBP', 'diastolicBP', 
+                 'temperature', 'respiratoryRate', 'oxygenSaturation', 'ph', 'pco2', 
                  'po2', 'hco3', 'lactate', 'ejectionFraction', 'glasgowComaScale'].includes(key)) {
                 data[key] = parseFloat(value) || null;
             } else if (['onVentilator', 'onVasopressors'].includes(key)) {
@@ -425,27 +433,40 @@ class ECMOExpertSystem {
 
     // 保存当前评估结果
     saveCurrentAssessment() {
-        if (!this.currentAssessment) return;
+        if (!this.currentAssessment) {
+            this.showError('没有可保存的评估结果');
+            return;
+        }
+
+        // 确保有基本的数据结构
+        const formData = this.getFormData('ecmo-form');
+        const patientId = formData.patientId || this.currentAssessment.patientId || `PATIENT_${Date.now()}`;
 
         const assessment = {
             id: Date.now().toString(),
             timestamp: new Date().toISOString(),
-            patientId: this.currentAssessment.patientId,
-            result: this.currentAssessment.ecmoResult,
+            patientId: patientId,
+            result: this.currentAssessment.ecmoResult || '评估完成',
             riskScore: this.currentAssessment.riskAssessment?.riskScore || 0,
-            confidence: this.currentAssessment.confidence || 0,
-            diagnosis: this.currentAssessment.diagnosis,
+            confidence: (this.currentAssessment.confidence || 0) * 100, // 转换为百分比
+            diagnosis: this.currentAssessment.diagnosis || '诊断信息',
             data: this.currentAssessment
         };
 
-        this.assessmentHistory.unshift(assessment);
+        console.log('保存评估:', assessment); // 调试日志
 
+        this.assessmentHistory.unshift(assessment);
+        
         // 限制历史记录数量
         if (this.assessmentHistory.length > 50) {
             this.assessmentHistory = this.assessmentHistory.slice(0, 50);
         }
-
+        
         localStorage.setItem('ecmoAssessments', JSON.stringify(this.assessmentHistory));
+
+        // 立即刷新历史记录显示
+        this.loadAssessmentHistory();
+
         this.showSuccess('评估结果已保存');
         this.closeModal();
     }
@@ -463,6 +484,16 @@ class ECMOExpertSystem {
     // 加载评估历史
     loadAssessmentHistory() {
         const historyList = document.getElementById('history-list');
+        
+        // 重新从localStorage加载数据，确保数据同步
+        this.assessmentHistory = JSON.parse(localStorage.getItem('ecmoAssessments') || '[]');
+
+        console.log('加载历史记录:', this.assessmentHistory.length, '条'); // 调试日志
+
+        if (!historyList) {
+            console.error('找不到history-list元素');
+            return;
+        }
 
         if (this.assessmentHistory.length === 0) {
             historyList.innerHTML = `
@@ -474,35 +505,78 @@ class ECMOExpertSystem {
             return;
         }
 
-        historyList.innerHTML = this.assessmentHistory.map(assessment => `
-            <div class="history-item">
-                <div class="history-header">
-                    <h4>患者ID: ${assessment.patientId}</h4>
-                    <div class="history-actions">
-                        <button class="btn-view" onclick="window.ecmoSystem.viewAssessment('${assessment.id}')">
-                            查看详情
-                        </button>
-                        <button class="btn-delete" onclick="window.ecmoSystem.deleteAssessment('${assessment.id}')">
-                            删除
-                        </button>
+        historyList.innerHTML = this.assessmentHistory.map(assessment => {
+            const safePatientId = assessment.patientId || '未知患者';
+            const safeResult = assessment.result || '评估结果';
+            const safeScore = Math.round(assessment.riskScore || 0);
+            const safeConfidence = Math.round(assessment.confidence || 0);
+            const safeTime = new Date(assessment.timestamp).toLocaleString('zh-CN');
+
+            return `
+                <div class="history-item ${this.getRiskClass(assessment.riskScore)}">
+                    <div class="history-header">
+                        <div class="history-title">
+                            <h4>患者ID: ${safePatientId}</h4>
+                            <div class="history-date">${safeTime}</div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-view" onclick="window.ecmoSystem.viewAssessment('${assessment.id}')" title="查看详情">
+                                👁️
+                            </button>
+                            <button class="btn-delete" onclick="window.ecmoSystem.deleteAssessment('${assessment.id}')" title="删除">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    <div class="history-summary">
+                        <div class="history-metric">
+                            <div class="history-metric-label">评估结果</div>
+                            <div class="history-metric-value">${safeResult}</div>
+                        </div>
+                        <div class="history-metric">
+                            <div class="history-metric-label">推荐指数</div>
+                            <div class="history-metric-value">${safeScore}/100</div>
+                        </div>
+                        <div class="history-metric">
+                            <div class="history-metric-label">置信度</div>
+                            <div class="history-metric-value">${safeConfidence}%</div>
+                        </div>
+                        <div class="history-metric">
+                            <div class="history-metric-label">风险等级</div>
+                            <div class="history-metric-value">
+                                <span class="history-risk-badge ${this.getRiskBadgeClass(safeScore)}">
+                                    ${this.getRiskLevel(safeScore)}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="history-content">
-                    <div class="history-result ${assessment.data.riskAssessment?.riskColor || 'gray'}">
-                        <strong>评估结果:</strong> ${assessment.result}
-                    </div>
-                    <div class="history-score">
-                        <strong>推荐指数:</strong> ${Math.round(assessment.riskScore)}/100
-                    </div>
-                    <div class="history-confidence">
-                        <strong>置信度:</strong> ${Math.round(assessment.confidence * 100)}%
-                    </div>
-                    <div class="history-time">
-                        <strong>评估时间:</strong> ${new Date(assessment.timestamp).toLocaleString('zh-CN')}
-                    </div>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    // 获取风险等级类名
+    getRiskClass(score) {
+        if (score >= 80) return 'low-risk';
+        else if (score >= 60) return 'medium-risk';
+        else if (score >= 40) return 'high-risk';
+        else return 'extreme-risk';
+    }
+
+    // 获取风险等级徽章类名
+    getRiskBadgeClass(score) {
+        if (score >= 80) return 'low';
+        else if (score >= 60) return 'medium';
+        else if (score >= 40) return 'high';
+        else return 'extreme';
+    }
+
+    // 获取风险等级文本
+    getRiskLevel(score) {
+        if (score >= 80) return '低风险';
+        else if (score >= 60) return '中等风险';
+        else if (score >= 40) return '高风险';
+        else return '极高风险';
     }
 
     // 查看评估详情
@@ -615,7 +689,7 @@ class ECMOExpertSystem {
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             transform: 'translateX(100%)',
             transition: 'transform 0.3s ease',
-            backgroundColor: type === 'error' ? '#f44336' :
+            backgroundColor: type === 'error' ? '#f44336' : 
                            type === 'success' ? '#4caf50' : '#2196f3'
         });
 
@@ -652,6 +726,117 @@ class ECMOExpertSystem {
             window.location.href = '/static/login.html';
         }
     }
+
+    // 搜索历史记录和筛选功能
+    searchHistory() {
+        const query = document.getElementById('history-search').value.trim().toLowerCase();
+
+        if (!query) {
+            this.filteredHistory = [...this.assessmentHistory];
+        } else {
+            this.filteredHistory = this.assessmentHistory.filter(assessment => {
+                return (assessment.patientId || '').toLowerCase().includes(query) ||
+                       (assessment.result || '').toLowerCase().includes(query) ||
+                       (assessment.diagnosis || '').toLowerCase().includes(query);
+            });
+        }
+
+        this.updateHistoryList();
+    }
+
+    // 筛选历史记录
+    filterHistory() {
+        const riskFilter = document.getElementById('risk-filter')?.value || '';
+        const dateFilter = document.getElementById('date-filter')?.value || '';
+
+        let filtered = [...this.assessmentHistory];
+
+        // 按风险等级筛选
+        if (riskFilter) {
+            filtered = filtered.filter(assessment => {
+                const riskLevel = this.getRiskLevel(assessment.riskScore || 0);
+                return riskLevel === riskFilter;
+            });
+        }
+
+        // 按时间筛选
+        if (dateFilter) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            filtered = filtered.filter(assessment => {
+                const assessmentDate = new Date(assessment.timestamp);
+
+                switch (dateFilter) {
+                    case 'today':
+                        return assessmentDate >= today;
+                    case 'week':
+                        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return assessmentDate >= weekAgo;
+                    case 'month':
+                        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        return assessmentDate >= monthAgo;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        this.filteredHistory = filtered;
+        this.updateHistoryList();
+    }
+
+    // 清空所有历史记录
+    clearAllHistory() {
+        if (confirm('确定要清空所有评估历史记录吗？此操作不可恢复。')) {
+            this.assessmentHistory = [];
+            this.filteredHistory = [];
+            localStorage.setItem('ecmoAssessments', JSON.stringify(this.assessmentHistory));
+            this.loadAssessmentHistory();
+            this.showSuccess('所有历史记录已清空');
+        }
+    }
+
+    // 导出评估记录（可选功能）
+    exportAssessment(assessmentId) {
+        const assessment = this.assessmentHistory.find(a => a.id === assessmentId);
+        if (assessment) {
+            const exportData = {
+                patientId: assessment.patientId,
+                timestamp: assessment.timestamp,
+                result: assessment.result,
+                diagnosis: assessment.diagnosis,
+                riskScore: assessment.riskScore,
+                confidence: assessment.confidence,
+                detailedData: assessment.data
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ECMO评估报告_${assessment.patientId}_${new Date(assessment.timestamp).toLocaleDateString()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            this.showSuccess('评估报告已导出');
+        }
+    }
+
+    // 自动保存功能（可选）
+    enableAutoSave() {
+        // 当评估完成时自动保存
+        const originalDisplayResult = this.displayAssessmentResult.bind(this);
+        this.displayAssessmentResult = function(result) {
+            originalDisplayResult(result);
+            // 可以在这里添加自动保存逻辑
+            console.log('评估结果已生成，可手动保存');
+        };
+    }
+
+    // ...existing code...
 }
 
 // 全局函数（用于HTML onclick事件）

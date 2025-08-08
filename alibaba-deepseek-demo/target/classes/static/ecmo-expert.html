@@ -224,8 +224,39 @@
                 <div id="history-section" class="section">
                     <div class="section-header">
                         <h2>评估历史</h2>
-                        <p class="section-desc">查看历史ECMO评估记录</p>
+                        <p class="section-desc">查看和管理历史ECMO评估记录</p>
                     </div>
+
+                    <!-- 历史记录工具栏 -->
+                    <div class="history-toolbar">
+                        <div class="search-group">
+                            <input type="text" id="history-search" placeholder="搜索患者ID或诊断..." class="search-input">
+                            <button onclick="searchHistory()" class="btn-search">
+                                <i class="icon-search"></i>
+                                搜索
+                            </button>
+                        </div>
+                        <div class="filter-group">
+                            <select id="risk-filter" onchange="filterHistory()">
+                                <option value="">所有风险等级</option>
+                                <option value="低风险">低风险</option>
+                                <option value="中等风险">中等风险</option>
+                                <option value="高风险">高风险</option>
+                                <option value="极高风险">极高风险</option>
+                            </select>
+                            <select id="date-filter" onchange="filterHistory()">
+                                <option value="">所有时间</option>
+                                <option value="today">今天</option>
+                                <option value="week">近一周</option>
+                                <option value="month">近一月</option>
+                            </select>
+                        </div>
+                        <button onclick="clearAllHistory()" class="btn-danger">
+                            <i class="icon-trash"></i>
+                            清空历史
+                        </button>
+                    </div>
+
                     <div id="history-list" class="history-list">
                         <div class="empty-state">
                             <i class="icon-history"></i>
