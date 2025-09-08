@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - AI聊天室</title>
-    <link rel="stylesheet" href="css/auth.css">
+    <title>登录 - ECMO诊疗专家系统</title>
+    <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,11 +21,11 @@
             <div class="auth-header">
                 <div class="brand-logo">
                     <div class="logo-icon">
-                        <i class="fas fa-brain"></i>
+                        <i class="fas fa-heart-pulse"></i>
                     </div>
                     <div class="brand-text">
-                        <h1>AI聊天室</h1>
-                        <span>Intelligent Conversation Platform</span>
+                        <h1>ECMO诊疗专家系统</h1>
+                        <span>Extracorporeal Clinical Support</span>
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <div class="form-section">
                     <div class="section-header">
                         <h2>欢迎回来</h2>
-                        <p>登录您的账户，继续AI智能对话</p>
+                        <p>登录后访问ECMO智能评估与知识库</p>
                     </div>
 
                     <form id="loginForm" class="premium-form">
@@ -51,7 +51,7 @@
                                     <div class="input-icon">
                                         <i class="fas fa-user"></i>
                                     </div>
-                                    <input type="text" id="username" name="username" placeholder="请输入用户名" required class="premium-input">
+                                    <input type="text" id="username" name="username" placeholder="请输入用户名 (内置: admin)" required class="premium-input">
                                     <div class="input-line"></div>
                                 </div>
                                 <div class="input-feedback" id="username-feedback"></div>
@@ -65,7 +65,7 @@
                                     <div class="input-icon">
                                         <i class="fas fa-lock"></i>
                                     </div>
-                                    <input type="password" id="password" name="password" placeholder="请输入密码" required class="premium-input">
+                                    <input type="password" id="password" name="password" placeholder="请输入密码 (内置: 123456)" required class="premium-input">
                                     <button type="button" class="password-reveal" onclick="togglePassword('password')">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -95,27 +95,6 @@
                             <div class="btn-shine"></div>
                         </button>
                     </form>
-
-                    <div class="divider-section">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">或使用第三方账户</span>
-                        <div class="divider-line"></div>
-                    </div>
-
-                    <div class="social-section">
-                        <button class="social-btn github-btn" onclick="socialLogin('github')">
-                            <div class="social-icon">
-                                <i class="fab fa-github"></i>
-                            </div>
-                            <span>GitHub</span>
-                        </button>
-                        <button class="social-btn google-btn" onclick="socialLogin('google')">
-                            <div class="social-icon">
-                                <i class="fab fa-google"></i>
-                            </div>
-                            <span>Google</span>
-                        </button>
-                    </div>
                 </div>
 
                 <div class="auth-footer">
@@ -125,6 +104,6 @@
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
+    <script src="/js/auth.js"></script>
 </body>
 </html>

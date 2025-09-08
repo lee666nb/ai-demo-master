@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册 - AI聊天室</title>
-    <link rel="stylesheet" href="css/auth.css">
+    <title>注册 - ECMO诊疗专家系统</title>
+    <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,11 +21,11 @@
             <div class="auth-header">
                 <div class="brand-logo">
                     <div class="logo-icon">
-                        <i class="fas fa-brain"></i>
+                        <i class="fas fa-heart-pulse"></i>
                     </div>
                     <div class="brand-text">
-                        <h1>AI聊天室</h1>
-                        <span>Intelligent Conversation Platform</span>
+                        <h1>ECMO诊疗专家系统</h1>
+                        <span>Extracorporeal Clinical Support</span>
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <div class="form-section">
                     <div class="section-header">
                         <h2>创建账户</h2>
-                        <p>开启您的AI智能对话之旅</p>
+                        <p>注册后可使用ECMO智能评估与知识库</p>
                     </div>
 
                     <form id="registerForm" class="premium-form">
@@ -48,11 +48,8 @@
                             <div class="input-group">
                                 <label class="input-label">用户名</label>
                                 <div class="input-container">
-                                    <div class="input-icon">
-                                        <i class="fas fa-user"></i>
-                                    </div>
+                                    <div class="input-icon"><i class="fas fa-user"></i></div>
                                     <input type="text" id="username" name="username" placeholder="请输入用户名" required minlength="3" maxlength="20" class="premium-input">
-                                    <div class="input-line"></div>
                                 </div>
                                 <div class="input-feedback" id="username-feedback"></div>
                             </div>
@@ -62,11 +59,8 @@
                             <div class="input-group">
                                 <label class="input-label">邮箱地址</label>
                                 <div class="input-container">
-                                    <div class="input-icon">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
+                                    <div class="input-icon"><i class="fas fa-envelope"></i></div>
                                     <input type="email" id="email" name="email" placeholder="请输入邮箱地址" required class="premium-input">
-                                    <div class="input-line"></div>
                                 </div>
                                 <div class="input-feedback" id="email-feedback"></div>
                             </div>
@@ -76,14 +70,9 @@
                             <div class="input-group">
                                 <label class="input-label">密码</label>
                                 <div class="input-container">
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
+                                    <div class="input-icon"><i class="fas fa-lock"></i></div>
                                     <input type="password" id="password" name="password" placeholder="请输入密码" required minlength="6" class="premium-input">
-                                    <button type="button" class="password-reveal" onclick="togglePassword('password')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <div class="input-line"></div>
+                                    <button type="button" class="password-reveal" onclick="togglePassword('password')"><i class="fas fa-eye"></i></button>
                                 </div>
                                 <div class="input-feedback" id="password-feedback"></div>
                             </div>
@@ -91,19 +80,22 @@
 
                         <div class="form-row">
                             <div class="input-group">
-                                <label class="input-label">确认密码</label>
+                                <label class="input-label">��认密码</label>
                                 <div class="input-container">
-                                    <div class="input-icon">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
+                                    <div class="input-icon"><i class="fas fa-lock"></i></div>
                                     <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required class="premium-input">
-                                    <button type="button" class="password-reveal" onclick="togglePassword('confirmPassword')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <div class="input-line"></div>
+                                    <button type="button" class="password-reveal" onclick="togglePassword('confirmPassword')"><i class="fas fa-eye"></i></button>
                                 </div>
-                                <div class="input-feedback" id="confirm-password-feedback"></div>
+                                <div class="input-feedback" id="confirmPassword-feedback"></div>
                             </div>
+                        </div>
+
+                        <div class="avatar-select-section">
+                            <label class="input-label">选择头像 (可选)</label>
+                            <div id="avatar-grid" class="avatar-grid">
+                                <!-- 动态加载头像 -->
+                            </div>
+                            <input type="hidden" id="avatar" name="avatar" value="" />
                         </div>
 
                         <div class="terms-section">
@@ -117,44 +109,20 @@
                         <button type="submit" class="premium-btn primary">
                             <span class="btn-content">
                                 <span class="btn-text">创建账户</span>
-                                <span class="btn-loading">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    创建中...
-                                </span>
+                                <span class="btn-loading"><i class="fas fa-spinner fa-spin"></i> 创建中...</span>
                             </span>
                             <div class="btn-shine"></div>
                         </button>
                     </form>
-
-                    <div class="divider-section">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">或使用第三方账户</span>
-                        <div class="divider-line"></div>
-                    </div>
-
-                    <div class="social-section">
-                        <button class="social-btn github-btn" onclick="socialLogin('github')">
-                            <div class="social-icon">
-                                <i class="fab fa-github"></i>
-                            </div>
-                            <span>GitHub</span>
-                        </button>
-                        <button class="social-btn google-btn" onclick="socialLogin('google')">
-                            <div class="social-icon">
-                                <i class="fab fa-google"></i>
-                            </div>
-                            <span>Google</span>
-                        </button>
-                    </div>
                 </div>
 
                 <div class="auth-footer">
-                    <p>已有账户？<a href="/login" class="text-link primary">立即登录</a></p>
+                    <p>已有账户？<a href="/login" class="text-link primary">立��登录</a></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
+    <script src="/js/auth.js"></script>
 </body>
 </html>

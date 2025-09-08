@@ -1315,6 +1315,38 @@ input:checked + .slider:before {
     border-color: var(--border-muted);
 }
 
+/* 头像图库样式 */
+.avatar-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.avatar-gallery::-webkit-scrollbar { width:6px; }
+.avatar-gallery::-webkit-scrollbar-thumb { background: var(--border-muted); border-radius:3px; }
+.avatar-option {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    padding: 2px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.avatar-option img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+}
+.avatar-option:hover { border-color: var(--brand-primary); transform: scale(1.05); }
+.avatar-option.selected { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(88,166,255,0.25); }
+.avatar-gallery .loading, .avatar-gallery .error { grid-column: 1/-1; text-align:center; font-size:0.75rem; color: var(--text-secondary); }
+
 /* 响应式设计 */
 @media (max-width: 1200px) {
     .chat-info-panel {

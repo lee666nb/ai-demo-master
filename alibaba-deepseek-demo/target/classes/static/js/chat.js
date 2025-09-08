@@ -17,6 +17,7 @@ class AdvancedChatManager {
         this.setupAutoResize();
         this.loadChatHistory();
         this.applySettings();
+        this.fetchServerProfile();
     }
 
     checkAuth() {
@@ -31,6 +32,25 @@ class AdvancedChatManager {
     getUserSession() {
         const sessionData = sessionStorage.getItem('userInfo') || localStorage.getItem('userInfo');
         return sessionData ? JSON.parse(sessionData) : null;
+    }
+
+    async fetchServerProfile() {
+        if (!this.currentUser) return;
+        try {
+            const resp = await fetch(`/api/profile/${this.currentUser.username}`);
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.success) {
+                    this.profile.nickname = data.nickname || this.profile.nickname;
+                    this.profile.bio = data.bio || this.profile.bio;
+                    this.profile.avatar = data.avatar || this.profile.avatar;
+                    this.saveProfileLocal();
+                    this.loadUserInfo();
+                }
+            }
+        } catch (e) {
+            console.warn('获取资料失败(使用本地缓存)', e);
+        }
     }
 
     loadUserInfo() {
@@ -431,8 +451,13 @@ class AdvancedChatManager {
         };
     }
 
-    saveProfile() {
+    // 覆盖保存资料：本地 + 后端
+    saveProfileLocal() {
         localStorage.setItem('userProfile', JSON.stringify(this.profile));
+    }
+
+    saveProfile() {
+        this.saveProfileLocal();
         this.loadUserInfo();
     }
 
@@ -645,6 +670,7 @@ function openProfileModal() {
     const avatarPreview = document.getElementById('avatarPreview');
     avatarPreview.src = chatManager.profile.avatar || document.getElementById('userAvatarImg').src;
 
+    buildAvatarGallery();
     modal.classList.add('show');
 }
 
@@ -658,68 +684,67 @@ function changeAvatar() {
 
 function saveProfile() {
     const chatManager = window.chatManager;
-
     chatManager.profile.nickname = document.getElementById('profileNickname').value;
     chatManager.profile.bio = document.getElementById('profileBio').value;
-
-    chatManager.saveProfile();
-    closeProfileModal();
-}
-
-function openSettingsModal() {
-    const modal = document.getElementById('settingsModalOverlay');
-    const chatManager = window.chatManager;
-
-    // 填充当前设置
-    document.getElementById('autoSave').checked = chatManager.settings.autoSave;
-    document.getElementById('shortcutKey').value = chatManager.settings.shortcutKey;
-    document.getElementById('showTime').checked = chatManager.settings.showTime;
-    document.getElementById('themeMode').value = chatManager.settings.themeMode;
-    document.getElementById('fontSize').value = chatManager.settings.fontSize;
-    document.getElementById('compactMode').checked = chatManager.settings.compactMode;
-    document.getElementById('aiSpeed').value = chatManager.settings.aiSpeed;
-    document.getElementById('contextLength').value = chatManager.settings.contextLength;
-    document.getElementById('streamOutput').checked = chatManager.settings.streamOutput;
-
-    modal.classList.add('show');
-}
-
-function closeSettingsModal() {
-    document.getElementById('settingsModalOverlay').classList.remove('show');
-}
-
-function switchTab(tabName) {
-    // 切换标签按钮状态
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
-
-    // 切换内容
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    document.getElementById(`${tabName}Tab`).classList.add('active');
-}
-
-function saveSettings() {
-    const chatManager = window.chatManager;
-
-    chatManager.settings.autoSave = document.getElementById('autoSave').checked;
-    chatManager.settings.shortcutKey = document.getElementById('shortcutKey').value;
-    chatManager.settings.showTime = document.getElementById('showTime').checked;
-    chatManager.settings.themeMode = document.getElementById('themeMode').value;
-    chatManager.settings.fontSize = document.getElementById('fontSize').value;
-    chatManager.settings.compactMode = document.getElementById('compactMode').checked;
-    chatManager.settings.aiSpeed = document.getElementById('aiSpeed').value;
-    chatManager.settings.contextLength = document.getElementById('contextLength').value;
-    chatManager.settings.streamOutput = document.getElementById('streamOutput').checked;
-
-    chatManager.saveSettings();
-    closeSettingsModal();
-}
-
-function sendMessage() {
-    const chatManager = window.chatManager;
-    if (chatManager) {
-        chatManager.sendMessage();
+    const avatarPreview = document.getElementById('avatarPreview').src;
+    // 如果预览是选择的头像则保存
+    if (avatarPreview) {
+        chatManager.profile.avatar = avatarPreview;
     }
+    // 调用后端
+    fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: chatManager.currentUser.username,
+            nickname: chatManager.profile.nickname,
+            bio: chatManager.profile.bio,
+            avatar: chatManager.profile.avatar
+        })
+    }).then(r => r.json())
+      .then(d => {
+          if (!d.success) {
+              alert(d.message || '保存失败');
+          } else {
+              chatManager.profile.avatar = d.avatar;
+          }
+          chatManager.saveProfile();
+          closeProfileModal();
+      }).catch(err => {
+          console.error('资料保存失败', err);
+          chatManager.saveProfile();
+          closeProfileModal();
+      });
+}
+
+function buildAvatarGallery() {
+    const gallery = document.getElementById('avatarGallery');
+    if (!gallery) return;
+    gallery.innerHTML = '<div class="loading">加载头像...</div>';
+    fetch('/api/avatars')
+        .then(r => r.json())
+        .then(d => {
+            if (!d.success) {
+                gallery.innerHTML = '<div class="error">加载失败</div>';
+                return;
+            }
+            const current = window.chatManager.profile.avatar;
+            gallery.innerHTML = d.avatars.map(src => `
+                <div class="avatar-option ${current && current.includes(src) ? 'selected' : ''}" data-src="${src}">
+                    <img src="${src}" alt="头像">
+                </div>`).join('');
+            gallery.querySelectorAll('.avatar-option').forEach(item => {
+                item.addEventListener('click', () => {
+                    gallery.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+                    item.classList.add('selected');
+                    const chosen = item.getAttribute('data-src');
+                    document.getElementById('avatarPreview').src = chosen;
+                });
+            });
+        })
+        .catch(() => {
+            gallery.innerHTML = '<div class="error">网络错误</div>';
+        });
 }
 
 // 页面加载完成后初始化

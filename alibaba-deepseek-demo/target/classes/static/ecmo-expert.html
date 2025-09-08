@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ECMO诊疗专家系统</title>
     <link rel="stylesheet" href="/static/ecmo-expert.css">
+    <!-- 引入Chart.js图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -24,7 +26,7 @@
             <!-- 侧边栏 -->
             <aside class="sidebar">
                 <nav class="nav-menu">
-                    <button class="nav-item active" onclick="showSection('assessment')">
+                    <button class="nav-item" onclick="showSection('assessment')">
                         <i class="icon-stethoscope"></i>
                         ECMO评估
                     </button>
@@ -40,13 +42,17 @@
                         <i class="icon-zap"></i>
                         快速评估
                     </button>
+                    <button class="nav-item active" onclick="showSection('introduction')">
+                        <i class="icon-info"></i>
+                        ECMO介绍
+                    </button>
                 </nav>
             </aside>
 
             <!-- 内容区域 -->
             <main class="content">
                 <!-- ECMO评估页面 -->
-                <div id="assessment-section" class="section active">
+                <div id="assessment-section" class="section">
                     <div class="section-header">
                         <h2>ECMO适应症评估</h2>
                         <p class="section-desc">请填写患者的详细参数进行专业ECMO评估</p>
@@ -319,7 +325,7 @@
                                             <li>年龄 > 75岁</li>
                                             <li>机械通气 > 7天</li>
                                             <li>多器官功能衰竭 > 48小时</li>
-                                            <li>不可逆性神经系统疾病</li>
+                                            <li>不可逆性��经系统疾病</li>
                                             <li>严重外周血管疾病</li>
                                             <li>严重肥胖(BMI > 40)</li>
                                         </ul>
@@ -423,7 +429,7 @@
                                         <p><strong>发生率:</strong> 30-50%</p>
                                         <ul>
                                             <li>颅内出血: 最严重，发生率3-8%</li>
-                                            <li>胃肠道出血: 常见，需要内镜检查</li>
+                                            <li>胃肠道出血: 常见，需���内镜检查</li>
                                             <li>插管部位出血: 局部压迫止血</li>
                                             <li>手术部位出血: 可能需要再次手术</li>
                                         </ul>
@@ -453,7 +459,7 @@
                                         <p><strong>发生率:</strong> 15-25%</p>
                                         <ul>
                                             <li>导管相关血流感染: 最常见</li>
-                                            <li>呼吸机相关肺炎: VAP风险增加</li>
+                                            <li>呼吸机相关肺炎: VAP风险增���</li>
                                             <li>泌尿系感染: 留置导尿管所致</li>
                                             <li>手术切口感染: 免疫功能下降</li>
                                         </ul>
@@ -628,6 +634,250 @@
                         <div id="quick-result-content"></div>
                     </div>
                 </div>
+
+                <!-- ECMO介绍页面 -->
+                <div id="introduction-section" class="section active">
+                    <div class="section-header">
+                        <h2>📖 ECMO技术介绍</h2>
+                        <p class="section-desc">全面了解ECMO的基本概念、技术原理和临床应用</p>
+                    </div>
+
+                    <div class="introduction-content">
+                        <!-- ECMO基本概念 -->
+                        <div class="intro-section">
+                            <div class="intro-card">
+                                <h3>🫀 什么是ECMO？</h3>
+                                <p><strong>ECMO（Extracorporeal Membrane Oxygenation）</strong>体外膜肺氧合，是一种为严重心肺功能不全患者提供体外生命支持的技术。</p>
+                                <p>它通过建立体外循环，将患者的血液引流到体外进行氧合和二氧化碳清除，然后再输回患者体内，从而暂时替代或辅助患者的心脏和/或肺功能。</p>
+                            </div>
+                        </div>
+
+                        <!-- ECMO统计数据看板 -->
+                        <div class="intro-section">
+                            <h3>📊 ECMO关键数据统计</h3>
+                            <div class="stats-dashboard">
+                                <div class="stat-card large">
+                                    <div class="stat-icon">🏥</div>
+                                    <div class="stat-content">
+                                        <div class="stat-number">65%</div>
+                                        <div class="stat-label">VV-ECMO使用比例</div>
+                                        <div class="stat-desc">静脉-静脉ECMO主要用于呼吸支持</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card large">
+                                    <div class="stat-icon">❤️</div>
+                                    <div class="stat-content">
+                                        <div class="stat-number">30%</div>
+                                        <div class="stat-label">VA-ECMO使用比例</div>
+                                        <div class="stat-desc">静脉-动脉ECMO用于心肺联合支持</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card large">
+                                    <div class="stat-icon">📈</div>
+                                    <div class="stat-content">
+                                        <div class="stat-number">60%</div>
+                                        <div class="stat-label">总体生存率</div>
+                                        <div class="stat-desc">全球ECMO治疗平均生存率</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 图表展示区域 - 固定高度容器 -->
+                        <div class="intro-section">
+                            <h3>📈 ECMO临床数据可视化</h3>
+
+                            <!-- 第一行图表 -->
+                            <div class="charts-row">
+                                <div class="chart-box">
+                                    <h4>ECMO类型分布</h4>
+                                    <div class="chart-wrapper">
+                                        <canvas id="ecmoTypesChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="chart-box">
+                                    <h4>适应症分布</h4>
+                                    <div class="chart-wrapper">
+                                        <canvas id="indicationsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第二行图表 -->
+                            <div class="charts-row">
+                                <div class="chart-box">
+                                    <h4>不同疾病生存率</h4>
+                                    <div class="chart-wrapper">
+                                        <canvas id="survivalRateChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="chart-box">
+                                    <h4>年龄组别成功率</h4>
+                                    <div class="chart-wrapper">
+                                        <canvas id="ageSuccessChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第三行图表 - 宽图表 -->
+                            <div class="charts-row">
+                                <div class="chart-box wide">
+                                    <h4>ECMO并发症发生率统计</h4>
+                                    <div class="chart-wrapper wide">
+                                        <canvas id="complicationsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第四行图表 - 趋势图 -->
+                            <div class="charts-row">
+                                <div class="chart-box wide">
+                                    <h4>ECMO应用量年度增长趋势</h4>
+                                    <div class="chart-wrapper wide">
+                                        <canvas id="trendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ECMO工作原理 -->
+                        <div class="intro-section">
+                            <h3>🔧 ECMO工作原理</h3>
+                            <div class="principle-grid">
+                                <div class="principle-card">
+                                    <div class="principle-icon">🩸</div>
+                                    <h4>血液引流</h4>
+                                    <p>通过静脉插管将缺氧血液从患者体内引流到ECMO回路</p>
+                                </div>
+                                <div class="principle-card">
+                                    <div class="principle-icon">🫁</div>
+                                    <h4>气体交换</h4>
+                                    <p>血液在膜肺氧合器中进行氧合，同时清除二氧化碳</p>
+                                </div>
+                                <div class="principle-card">
+                                    <div class="principle-icon">🔄</div>
+                                    <h4>血液回输</h4>
+                                    <p>氧合后的血液通过动脉或静脉插管返回患者循环系统</p>
+                                </div>
+                                <div class="principle-card">
+                                    <div class="principle-icon">📊</div>
+                                    <h4>持续监测</h4>
+                                    <p>实时监测血流量、压力、血气等参数，确保治疗效果</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ECMO操作流程时间线 -->
+                        <div class="intro-section">
+                            <h3>⏱️ ECMO操作流程时间线</h3>
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">1</div>
+                                    <div class="timeline-content">
+                                        <h4>患者评估 (30-60分钟)</h4>
+                                        <p>评估ECMO适应症、禁忌症，完善相关检查，获得知情同意</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">2</div>
+                                    <div class="timeline-content">
+                                        <h4>设备准备 (15-30分钟)</h4>
+                                        <p>准备ECMO设备，预充管路，调试参数，准备插管器械</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">3</div>
+                                    <div class="timeline-content">
+                                        <h4>血管插管 (30-60分钟)</h4>
+                                        <p>在超声或透视引导下建立动静脉通路，连接ECMO回路</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">4</div>
+                                    <div class="timeline-content">
+                                        <h4>启动运行 (即时)</h4>
+                                        <p>启动ECMO设备，调整血流量和氧流量，监测各项参数</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">5</div>
+                                    <div class="timeline-content">
+                                        <h4>持续管理 (数日到数周)</h4>
+                                        <p>24小时监护，定期评估，调整参数，预防并发症</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker">6</div>
+                                    <div class="timeline-content">
+                                        <h4>脱机评估 (根据恢复情况)</h4>
+                                        <p>评估心肺功能恢复，逐步减少ECMO支持，准备脱机</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 关键参数监测 -->
+                        <div class="intro-section">
+                            <h3>📋 ECMO关键参数监测</h3>
+                            <div class="parameters-grid">
+                                <div class="parameter-category">
+                                    <h4>🩸 血流动力学</h4>
+                                    <ul>
+                                        <li>ECMO血流量: 成人3-7L/min</li>
+                                        <li>转速: 1500-4000 rpm</li>
+                                        <li>前后压差: <100 mmHg</li>
+                                        <li>静脉引流压: -20 to -80 mmHg</li>
+                                    </ul>
+                                </div>
+                                <div class="parameter-category">
+                                    <h4>🫁 气体交换</h4>
+                                    <ul>
+                                        <li>氧流量: 1-15 L/min</li>
+                                        <li>FiO2: 0.21-1.0</li>
+                                        <li>扫气流量: 0.5-10 L/min</li>
+                                        <li>膜肺后PO2: >150 mmHg</li>
+                                    </ul>
+                                </div>
+                                <div class="parameter-category">
+                                    <h4>🧪 实验室检查</h4>
+                                    <ul>
+                                        <li>ACT: 180-220秒</li>
+                                        <li>血小板: >50×10⁹/L</li>
+                                        <li>纤维蛋白原: >100 mg/dL</li>
+                                        <li>游离血红蛋白: <50 mg/dL</li>
+                                    </ul>
+                                </div>
+                                <div class="parameter-category">
+                                    <h4>⚕️ 临床监测</h4>
+                                    <ul>
+                                        <li>血压: 维持灌注压>65 mmHg</li>
+                                        <li>尿量: >0.5 mL/kg/h</li>
+                                        <li>乳酸: <2 mmol/L</li>
+                                        <li>中心静脉氧饱和度: >70%</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 重要提醒 -->
+                        <div class="intro-section">
+                            <div class="introduction-alert">
+                                <h4>⚠️ 重要提醒</h4>
+                                <div class="alert-content">
+                                    <p><strong>ECMO是一项复杂的生命支持技术，需要：</strong></p>
+                                    <ul>
+                                        <li>🏥 具备ECMO资质的医疗机构</li>
+                                        <li>👨‍⚕️ 经过专业培训的多学科团队</li>
+                                        <li>🔧 完善的设备和监测条件</li>
+                                        <li>📋 严格的���量控制和管理流程</li>
+                                        <li>💬 充分的患者和家属沟通</li>
+                                    </ul>
+                                    <p><strong>ECMO的启动应该基于严格的适应症评估，并充分权衡获益风险比。</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -779,7 +1029,408 @@
         // 初始化系统
         window.addEventListener('DOMContentLoaded', () => {
             window.ecmoSystem = new ECMOExpertSystem();
+            // 初始化ECMO介绍页面图表
+            initECMOCharts();
         });
+
+        // ECMO图表初始化函数
+        function initECMOCharts() {
+            // 延迟初始化图表，确保页面元素已加载
+            setTimeout(() => {
+                if (document.getElementById('ecmoTypesChart')) {
+                    initECMOTypesChart();
+                }
+                if (document.getElementById('indicationsChart')) {
+                    initIndicationsChart();
+                }
+                if (document.getElementById('survivalRateChart')) {
+                    initSurvivalRateChart();
+                }
+                if (document.getElementById('ageSuccessChart')) {
+                    initAgeSuccessChart();
+                }
+                if (document.getElementById('complicationsChart')) {
+                    initComplicationsChart();
+                }
+                if (document.getElementById('trendChart')) {
+                    initTrendChart();
+                }
+            }, 100);
+        }
+
+        // ECMO类型分布图表
+        function initECMOTypesChart() {
+            const ctx = document.getElementById('ecmoTypesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['VV-ECMO (静脉-静脉)', 'VA-ECMO (静脉-动脉)', 'VAV-ECMO (静脉-动脉-静脉)'],
+                    datasets: [{
+                        data: [65, 30, 5],
+                        backgroundColor: [
+                            '#3b82f6', // 蓝色
+                            '#10b981', // 绿色
+                            '#f59e0b'  // 橙色
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 适应症分布图表
+        function initIndicationsChart() {
+            const ctx = document.getElementById('indicationsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['ARDS', '心源性休克', '心脏骤停', '肺栓塞', '暴发性心肌炎', '其他'],
+                    datasets: [{
+                        data: [35, 25, 15, 10, 8, 7],
+                        backgroundColor: [
+                            '#ef4444', // 红色
+                            '#8b5cf6', // 紫色
+                            '#06b6d4', // 青色
+                            '#84cc16', // 绿色
+                            '#f97316', // 橙色
+                            '#6b7280'  // 灰色
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 生存率图表
+        function initSurvivalRateChart() {
+            const ctx = document.getElementById('survivalRateChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ARDS', '心源性休克', '心脏骤停', '肺栓塞', '暴发性心肌炎'],
+                    datasets: [{
+                        label: '生存率 (%)',
+                        data: [65, 45, 35, 70, 75],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6'
+                        ],
+                        borderColor: [
+                            '#2563eb',
+                            '#059669',
+                            '#d97706',
+                            '#dc2626',
+                            '#7c3aed'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '生存率 (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '疾病类型'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '生存率: ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 年龄组别成功率图表
+        function initAgeSuccessChart() {
+            const ctx = document.getElementById('ageSuccessChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0-18岁', '19-30岁', '31-45岁', '46-60岁', '61-70岁', '70岁以上'],
+                    datasets: [{
+                        label: '成功率',
+                        data: [75, 80, 70, 65, 55, 40],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '成功率 (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '年龄组'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '成功率: ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 并发症发生率图表
+        function initComplicationsChart() {
+            const ctx = document.getElementById('complicationsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['出血', '感染', '血栓形成', '神经系统', '肾功能损害', '机械故障', '肢体缺血'],
+                    datasets: [{
+                        label: '发生率 (%)',
+                        data: [40, 25, 20, 15, 18, 8, 12],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#eab308',
+                            '#22c55e',
+                            '#06b6d4',
+                            '#8b5cf6',
+                            '#ec4899'
+                        ],
+                        borderColor: [
+                            '#dc2626',
+                            '#ea580c',
+                            '#ca8a04',
+                            '#16a34a',
+                            '#0891b2',
+                            '#7c3aed',
+                            '#db2777'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // 水平条形图
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 50,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '发生率 (%)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '并发症类型'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed.x + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 发展趋势图表
+        function initTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                    datasets: [
+                        {
+                            label: '全球ECMO应用量',
+                            data: [8500, 9200, 10800, 12500, 14200, 18500, 22000, 25500, 28000, 31000],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        },
+                        {
+                            label: '中国ECMO应用量',
+                            data: [450, 580, 720, 950, 1200, 1800, 2500, 3200, 3800, 4500],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3,
+                            pointBackgroundColor: '#ef4444',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '应用量 (例次)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '年份'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' 例次';
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

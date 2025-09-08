@@ -5,6 +5,30 @@ spring:
   application:
     name: alibaba-deepseek-demo
 
+  # MySQL数据库配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/ECMO?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: liyi12363
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
   # 静态资源配置
   web:
     resources:
@@ -14,7 +38,7 @@ spring:
 
   # MVC配置
   mvc:
-    static-path-pattern: /static/**
+    static-path-pattern: /**
 
   ai:
     openai:

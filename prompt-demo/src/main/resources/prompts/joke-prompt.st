@@ -1,1 +1,0 @@
-给我讲一个关于 {topic} 的 {adjective} 笑话

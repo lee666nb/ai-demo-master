@@ -54,14 +54,14 @@ public class ECMOExpertController {
             response.put("patientId", assessment.getPatientId());
             
             // 4个核心输出
-            response.put("ecmoResult", assessment.isCanUseECMO() ? "推荐" : "不推荐");
+            response.put("ecmoResult", assessment.getCanUseECMO() ? "推荐" : "不推荐");
             response.put("diagnosis", assessment.getDiagnosis());
             response.put("evidence", assessment.getEvidence());
             response.put("confidence", Math.round(assessment.getConfidence() * 100.0) / 100.0);
             
             // 动态风险评分
             Map<String, Object> riskAssessment = new HashMap<>();
-            riskAssessment.put("riskScore", Math.round(assessment.getRiskScore() * 10.0) / 10.0);
+            riskAssessment.put("riskScore", Math.round(assessment.getRiskScore().doubleValue() * 10.0) / 10.0);
             riskAssessment.put("riskLevel", assessment.getRiskLevel());
             riskAssessment.put("riskColor", assessment.getRiskColor());
             riskAssessment.put("keyRiskFactors", assessment.getKeyRiskFactors());
@@ -172,7 +172,7 @@ public class ECMOExpertController {
                 Map<String, Object> assessmentInfo = new HashMap<>();
                 assessmentInfo.put("assessmentId", assessment.getAssessmentId());
                 assessmentInfo.put("patientId", assessment.getPatientId());
-                assessmentInfo.put("canUseECMO", assessment.isCanUseECMO());
+                assessmentInfo.put("canUseECMO", assessment.getCanUseECMO());
                 assessmentInfo.put("confidence", assessment.getConfidence());
                 assessmentInfo.put("riskScore", assessment.getRiskScore());
                 assessmentInfo.put("riskLevel", assessment.getRiskLevel());

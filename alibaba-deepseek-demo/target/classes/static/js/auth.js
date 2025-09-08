@@ -7,6 +7,33 @@ class AuthManager {
     init() {
         this.bindEvents();
         this.setupFormValidation();
+        this.initAvatarSelection(); // 新增
+    }
+
+    initAvatarSelection() {
+        const grid = document.getElementById('avatar-grid');
+        if (!grid) return;
+        fetch('/api/avatars').then(r=>r.json()).then(data=>{
+            if(!data.success) return;
+            grid.innerHTML = data.avatars.map(url=>`
+                <div class="avatar-item" data-url="${url}" tabindex="0">
+                    <img src="${url}" alt="avatar">
+                </div>`).join('');
+            const hidden = document.getElementById('avatar');
+            const select = (el)=>{
+                grid.querySelectorAll('.avatar-item').forEach(i=>i.classList.remove('selected'));
+                el.classList.add('selected');
+                hidden.value = el.getAttribute('data-url');
+            };
+            grid.addEventListener('click',e=>{
+                const item = e.target.closest('.avatar-item');
+                if(item) select(item);
+            });
+            grid.addEventListener('keydown',e=>{
+                if(e.key==='Enter'){ const item=e.target.closest('.avatar-item'); if(item) select(item);} });
+            // 默认选第一个
+            const first = grid.querySelector('.avatar-item'); if(first) select(first);
+        }).catch(()=>{});
     }
 
     bindEvents() {
@@ -79,41 +106,17 @@ class AuthManager {
         this.setButtonLoading(submitBtn, true);
 
         try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    rememberMe: rememberMe
-                })
-            });
-
+            const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type':'application/json'}, body: JSON.stringify({ username, password, rememberMe }) });
             const result = await response.json();
-
             if (result.success) {
-                // 保存用户信息
                 this.saveUserSession(result, rememberMe);
-
-                // 显示成功消息
-                this.showMessage('登录成功！正在跳转到ECMO诊疗专家系统...', 'success');
-
-                // 延迟跳转到ECMO诊疗专家系统
-                setTimeout(() => {
-                    window.location.href = '/ecmo-expert';
-                }, 1500);
+                this.showMessage('登录成功，正在跳转...', 'success');
+                setTimeout(()=>{ window.location.href = '/ecmo-expert.html'; }, 800);
             } else {
-                this.showMessage(result.message || '登录失败，请检查用户名和密码', 'error');
+                this.showMessage(result.message || '登录失败', 'error');
             }
-        } catch (error) {
-            console.error('登录错误:', error);
-            this.showMessage('网络错误，请稍后重试', 'error');
-        } finally {
-            this.setButtonLoading(submitBtn, false);
-        }
-    }
+        } catch (e2) { this.showMessage('网络错误，请稍后重试','error'); }
+        finally { this.setButtonLoading(submitBtn,false);} }
 
     async handleRegister(e) {
         e.preventDefault();
@@ -125,6 +128,7 @@ class AuthManager {
         const password = form.password.value;
         const confirmPassword = form.confirmPassword.value;
         const agreeTerms = form.agreeTerms.checked;
+        const avatar = form.avatar?.value || '';
 
         // 验证输入
         if (!this.validateRegisterForm(username, email, password, confirmPassword, agreeTerms)) {
@@ -136,36 +140,23 @@ class AuthManager {
 
         try {
             const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: username,
-                    email: email,
-                    password: password
-                })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, avatar })
             });
-
             const result = await response.json();
 
             if (result.success) {
                 // 显示成功消息
-                this.showMessage('注册成功！请登录您的账户', 'success');
+                this.showMessage('注册成功！请登录', 'success');
 
                 // 延迟跳转到登录页面
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 2000);
+                setTimeout(()=>{ window.location.href = '/login'; },1500);
             } else {
                 this.showMessage(result.message || '注册失败，请稍后重试', 'error');
             }
         } catch (error) {
-            console.error('注册错误:', error);
             this.showMessage('网络错误，请稍后重试', 'error');
-        } finally {
-            this.setButtonLoading(submitBtn, false);
-        }
+        } finally { this.setButtonLoading(submitBtn, false); }
     }
 
     validateLoginForm(username, password) {
@@ -356,6 +347,7 @@ class AuthManager {
         storage.setItem('userInfo', JSON.stringify({
             username: userData.username,
             email: userData.email,
+            avatar: userData.avatar || '/image/1.jpg', // 修正路径
             loginTime: new Date().toISOString()
         }));
     }

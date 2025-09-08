@@ -1,102 +1,220 @@
 package com.fox.alibabadeepseekdemo.entity;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 /**
  * ECMO评估结果实体类
- * 包含4个核心输出：诊断结果、诊断原因、诊断依据、置信度
+ * 包含完整的ECMO评估信息和诊断结果
  */
+@Entity
+@Table(name = "ecmo_assessments")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ECMOAssessment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "patient_id", length = 50)
     private String patientId;
+
+    @Column(name = "assessment_title", length = 200)
+    private String assessmentTitle;
+
+    // 基本信息
+    @Column(nullable = false)
+    private Integer age;
+
+    @Column(nullable = false, length = 10)
+    private String gender;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal weight;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal height;
+
+    // 生命体征
+    @Column(name = "heart_rate", nullable = false)
+    private Integer heartRate;
+
+    @Column(name = "systolic_bp", nullable = false)
+    private Integer systolicBp;
+
+    @Column(name = "diastolic_bp", nullable = false)
+    private Integer diastolicBp;
+
+    @Column(precision = 4, scale = 2)
+    private BigDecimal temperature;
+
+    @Column(name = "respiratory_rate", nullable = false)
+    private Integer respiratoryRate;
+
+    @Column(name = "oxygen_saturation", nullable = false, precision = 5, scale = 2)
+    private BigDecimal oxygenSaturation;
+
+    // 血气分析
+    @Column(nullable = false, precision = 4, scale = 3)
+    private BigDecimal ph;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal pco2;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal po2;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal hco3;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal lactate;
+
+    // 心脏功能
+    @Column(name = "ejection_fraction", precision = 5, scale = 2)
+    private BigDecimal ejectionFraction;
+
+    @Column(name = "troponin_i", precision = 8, scale = 3)
+    private BigDecimal troponinI;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal bnp;
+
+    @Column(name = "ecg_findings", columnDefinition = "TEXT")
+    private String ecgFindings;
+
+    // 临床状况
+    @Column(name = "glasgow_coma_scale")
+    private Integer glasgowComaScale;
+
+    @Column(name = "on_ventilator", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean onVentilator = false;
+
+    @Column(name = "on_vasopressors", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean onVasopressors = false;
+
+    @Column(name = "primary_diagnosis", length = 500)
+    private String primaryDiagnosis;
+
+    @Column(name = "clinical_presentation", columnDefinition = "TEXT")
+    private String clinicalPresentation;
+
+    // 评估结果 - 数据库字段
+    @Column(name = "risk_level", length = 20)
+    private String riskLevel;
+
+    @Column(name = "risk_score", precision = 5, scale = 2)
+    private BigDecimal riskScore;
+
+    @Column(columnDefinition = "TEXT")
+    private String recommendation;
+
+    @Column(name = "diagnosis_conclusion", columnDefinition = "TEXT")
+    private String diagnosisConclusion;
+
+    @Column(name = "ecmo_indication", columnDefinition = "BOOLEAN")
+    private Boolean ecmoIndication;
+
+    // 其他信息
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
+    @Column(name = "assessment_type", length = 20)
+    private String assessmentType = "STANDARD";
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // ===== 非持久化字段 - 用于业务逻辑 =====
+
+    // 评估ID (用于前端)
+    @Transient
     private String assessmentId;
-    private Date assessmentTime;
-    
-    // 4个核心输出
-    private boolean canUseECMO; // ECMO诊断结果（推荐/不推荐）
-    private String diagnosis; // 诊断原因
-    private String evidence; // 诊断依据
-    private Double confidence; // 置信度 (0-1)
-    
-    // 动态风险评分
-    private Double riskScore; // ECMO实施推荐指数 (0-100)
-    private String riskLevel; // 风险等级：HIGH(推荐)、MEDIUM(谨慎)、LOW(不推荐)
-    private String riskColor; // 颜色标识：green(推荐)、yellow(谨慎)、red(不推荐)
-    private List<String> keyRiskFactors; // 关键扣分点
-    
-    // 决策辅助卡
-    private List<String> supportReasons; // 支持使用依据
-    private List<String> opposeReasons; // 反对使用依据
-    private String finalRecommendation; // 建议结论
-    private Map<String, String> guidelineReferences; // 专家共识/指南原文
-    
-    // 详细评估
-    private List<String> recommendations; // 详细建议
-    private Map<String, Object> detailedScores; // 各项指标得分
-    private String contraindications; // 禁忌症
-    private String precautions; // 注意事项
-    
-    // 构造函数
-    public ECMOAssessment() {
-        this.assessmentTime = new Date();
+
+    // ECMO可用性
+    @Transient
+    private Boolean canUseECMO;
+
+    // 诊断信息
+    @Transient
+    private String diagnosis;
+
+    @Transient
+    private String evidence;
+
+    @Transient
+    private Double confidence;
+
+    // 最终建议
+    @Transient
+    private String finalRecommendation;
+
+    // 禁忌症和注意事项
+    @Transient
+    private String contraindications;
+
+    @Transient
+    private String precautions;
+
+    // 风险颜色
+    @Transient
+    private String riskColor;
+
+    // 支持和反对理由
+    @Transient
+    private List<String> supportReasons;
+
+    @Transient
+    private List<String> opposeReasons;
+
+    // 建议列表
+    @Transient
+    private List<String> recommendations;
+
+    // 关键风险因素
+    @Transient
+    private List<String> keyRiskFactors;
+
+    // 指南参考
+    @Transient
+    private Map<String, String> guidelineReferences;
+
+    // 详细评分
+    @Transient
+    private Map<String, Object> detailedScores;
+
+    // 评估时间
+    @Transient
+    private LocalDateTime assessmentTime;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
-    
-    // Getter和Setter方法
-    public String getPatientId() { return patientId; }
-    public void setPatientId(String patientId) { this.patientId = patientId; }
-    
-    public String getAssessmentId() { return assessmentId; }
-    public void setAssessmentId(String assessmentId) { this.assessmentId = assessmentId; }
-    
-    public Date getAssessmentTime() { return assessmentTime; }
-    public void setAssessmentTime(Date assessmentTime) { this.assessmentTime = assessmentTime; }
-    
-    public boolean isCanUseECMO() { return canUseECMO; }
-    public void setCanUseECMO(boolean canUseECMO) { this.canUseECMO = canUseECMO; }
-    
-    public String getDiagnosis() { return diagnosis; }
-    public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
-    
-    public String getEvidence() { return evidence; }
-    public void setEvidence(String evidence) { this.evidence = evidence; }
-    
-    public Double getConfidence() { return confidence; }
-    public void setConfidence(Double confidence) { this.confidence = confidence; }
-    
-    public Double getRiskScore() { return riskScore; }
-    public void setRiskScore(Double riskScore) { this.riskScore = riskScore; }
-    
-    public String getRiskLevel() { return riskLevel; }
-    public void setRiskLevel(String riskLevel) { this.riskLevel = riskLevel; }
-    
-    public String getRiskColor() { return riskColor; }
-    public void setRiskColor(String riskColor) { this.riskColor = riskColor; }
-    
-    public List<String> getKeyRiskFactors() { return keyRiskFactors; }
-    public void setKeyRiskFactors(List<String> keyRiskFactors) { this.keyRiskFactors = keyRiskFactors; }
-    
-    public List<String> getSupportReasons() { return supportReasons; }
-    public void setSupportReasons(List<String> supportReasons) { this.supportReasons = supportReasons; }
-    
-    public List<String> getOpposeReasons() { return opposeReasons; }
-    public void setOpposeReasons(List<String> opposeReasons) { this.opposeReasons = opposeReasons; }
-    
-    public String getFinalRecommendation() { return finalRecommendation; }
-    public void setFinalRecommendation(String finalRecommendation) { this.finalRecommendation = finalRecommendation; }
-    
-    public Map<String, String> getGuidelineReferences() { return guidelineReferences; }
-    public void setGuidelineReferences(Map<String, String> guidelineReferences) { this.guidelineReferences = guidelineReferences; }
-    
-    public List<String> getRecommendations() { return recommendations; }
-    public void setRecommendations(List<String> recommendations) { this.recommendations = recommendations; }
-    
-    public Map<String, Object> getDetailedScores() { return detailedScores; }
-    public void setDetailedScores(Map<String, Object> detailedScores) { this.detailedScores = detailedScores; }
-    
-    public String getContraindications() { return contraindications; }
-    public void setContraindications(String contraindications) { this.contraindications = contraindications; }
-    
-    public String getPrecautions() { return precautions; }
-    public void setPrecautions(String precautions) { this.precautions = precautions; }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // 与User实体的关联
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
 }

@@ -35,11 +35,7 @@
     </properties>
 
     <modules>
-        <module>alibaba-ai-demo</module>
         <module>alibaba-deepseek-demo</module>
-        <module>qwq-demo</module>
-        <module>higress-demo</module>
-        <module>chat-ollama-demo</module>
     </modules>
 
 

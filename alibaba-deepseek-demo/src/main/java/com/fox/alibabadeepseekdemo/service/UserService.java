@@ -2,136 +2,136 @@ package com.fox.alibabadeepseekdemo.service;
 
 import com.fox.alibabadeepseekdemo.entity.User;
 import com.fox.alibabadeepseekdemo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public User getUserByToken(String token) {
-        Optional<User> userOpt = userRepository.findByAuthToken(token);
-        return userOpt.orElse(null);
-    }
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
+    );
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");
+    private static final String DEFAULT_AVATAR = "/static/image/default-avatar.jpg";
 
-    public User getUserByUsername(String username) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        return userOpt.orElse(null);
-    }
+    public User register(String username, String email, String rawPassword, String realName, String department, String title, String hospital) {
+        String err = validate(username, email, rawPassword);
+        if (err != null) {
+            throw new IllegalArgumentException(err);
+        }
 
-    public User createUser(String username, String password, String email) {
-        User user = new User(username, password, email);
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("用户名已存在，请选择其他用户名");
+        }
+
+        if (email != null && userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("邮箱已被注册，请使用其他邮箱");
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setRealName(realName);
+        user.setDepartment(department);
+        user.setTitle(title);
+        user.setHospital(hospital);
+        user.setAvatarUrl(DEFAULT_AVATAR);
+        user.setStatus(1);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
         return userRepository.save(user);
     }
 
-    public String generateToken(User user) {
-        String token = UUID.randomUUID().toString();
-        user.setAuthToken(token);
-        user.setLastLogin(LocalDateTime.now());
+    public User register(String username, String email, String rawPassword) {
+        return register(username, email, rawPassword, null, null, null, null);
+    }
+
+    public User login(String username, String rawPassword) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("用户名或密码错误");
+        }
+
+        User user = userOpt.get();
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("用户名或密码错误");
+        }
+
+        if (user.getStatus() != 1) {
+            throw new IllegalArgumentException("账户已被禁用，请联系管理员");
+        }
+
+        // 更新最后登录时间
+        user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
-        return token;
+
+        return user;
     }
 
-    public boolean validateToken(String token) {
-        User user = getUserByToken(token);
-        return user != null;
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 
-    public void logout(String token) {
-        Optional<User> userOpt = userRepository.findByAuthToken(token);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setAuthToken(null);
-            userRepository.save(user);
-        }
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    public Map<String, Object> login(String username, String password) {
-        Map<String, Object> result = new HashMap<>();
+    public User updateProfile(Long userId, String realName, String department, String title, String hospital, String phone, String email) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("用户不存在"));
 
-        try {
-            Optional<User> userOpt = userRepository.findByUsername(username);
-
-            if (userOpt.isEmpty()) {
-                result.put("success", false);
-                result.put("message", "用户不存在");
-                return result;
-            }
-
-            User user = userOpt.get();
-
-            if (!user.getPassword().equals(password)) {
-                result.put("success", false);
-                result.put("message", "密码错误");
-                return result;
-            }
-
-            // 生成token
-            String token = generateToken(user);
-
-            result.put("success", true);
-            result.put("message", "登录成功");
-            result.put("token", token);
-            result.put("user", Map.of(
-                    "id", user.getId(),
-                    "username", user.getUsername(),
-                    "email", user.getEmail()
-            ));
-
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", "登录失败：" + e.getMessage());
-        }
-
-        return result;
-    }
-
-    public Map<String, Object> register(String username, String password, String email) {
-        Map<String, Object> result = new HashMap<>();
-
-        try {
-            // 检查用户名是否已存在
-            if (userRepository.findByUsername(username).isPresent()) {
-                result.put("success", false);
-                result.put("message", "用户名已存在");
-                return result;
-            }
-
-            // 检查邮箱是否已存在
+        if (realName != null) user.setRealName(realName);
+        if (department != null) user.setDepartment(department);
+        if (title != null) user.setTitle(title);
+        if (hospital != null) user.setHospital(hospital);
+        if (phone != null) user.setPhone(phone);
+        if (email != null && !email.equals(user.getEmail())) {
             if (userRepository.findByEmail(email).isPresent()) {
-                result.put("success", false);
-                result.put("message", "邮箱已被注册");
-                return result;
+                throw new IllegalArgumentException("邮箱已被使用");
             }
-
-            // 创建新用户
-            User user = createUser(username, password, email);
-
-            // 生成token
-            String token = generateToken(user);
-
-            result.put("success", true);
-            result.put("message", "注册成功");
-            result.put("token", token);
-            result.put("user", Map.of(
-                    "id", user.getId(),
-                    "username", user.getUsername(),
-                    "email", user.getEmail()
-            ));
-
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", "注册失败：" + e.getMessage());
+            user.setEmail(email);
         }
 
-        return result;
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    public User updateAvatar(Long userId, String avatarUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("用户不存在"));
+
+        user.setAvatarUrl(avatarUrl);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    private String validate(String username, String email, String password) {
+        if (username == null || username.isBlank()) {
+            return "用户名不能为空";
+        }
+        if (!USERNAME_PATTERN.matcher(username).matches()) {
+            return "用户名只能包含字母、数字和下划线，长度3-20字符";
+        }
+        if (email != null && !email.isBlank() && !EMAIL_PATTERN.matcher(email).matches()) {
+            return "邮箱格式不正确";
+        }
+        if (password == null || password.length() < 6) {
+            return "密码长度至少6字符";
+        }
+        if (password.length() > 100) {
+            return "密码长度不能超过100字符";
+        }
+        return null;
     }
 }

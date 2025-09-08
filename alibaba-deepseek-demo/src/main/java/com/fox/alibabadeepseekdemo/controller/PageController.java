@@ -8,31 +8,26 @@ public class PageController {
 
     @GetMapping("/")
     public String index() {
-        return "redirect:/login";
+        return "redirect:/login.html"; // 直接使用静态页面
     }
 
     @GetMapping("/login")
     public String loginPage() {
-        return "forward:/static/login.html";
+        return "redirect:/login.html"; // 避免循环视图
     }
 
     @GetMapping("/register")
     public String registerPage() {
-        return "forward:/static/register.html";
-    }
-
-    @GetMapping("/chat")
-    public String chatPage() {
-        return "forward:/static/chat.html";
+        return "redirect:/register.html";
     }
 
     @GetMapping("/ecmo")
     public String ecmoPage() {
-        return "forward:/static/ecmo-expert.html";
+        return "redirect:/ecmo-expert.html";
     }
 
     @GetMapping("/ecmo-expert")
     public String ecmoExpertPage() {
-        return "forward:/static/ecmo-expert.html";
+        return "redirect:/ecmo-expert.html";
     }
 }

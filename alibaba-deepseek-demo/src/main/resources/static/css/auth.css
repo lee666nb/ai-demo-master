@@ -365,7 +365,7 @@ body {
     color: var(--error);
 }
 
-/* 输入反馈信息 */
+/* 输入���馈信息 */
 .input-feedback {
     display: none;
     color: var(--error);
@@ -745,7 +745,7 @@ body {
 
     .premium-input {
         padding: 14px 14px 14px 44px;
-        font-size: 16px; /* 防止iOS缩放 */
+        font-size: 16px; /* 防止iOS���放 */
     }
 
     .input-container .input-icon {

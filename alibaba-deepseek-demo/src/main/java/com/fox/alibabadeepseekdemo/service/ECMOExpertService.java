@@ -5,6 +5,7 @@ import com.fox.alibabadeepseekdemo.entity.PatientParameters;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -229,8 +230,8 @@ public class ECMOExpertService {
     private ECMOAssessment parseAIResponse(String aiResponse, String patientId, Double riskScore) {
         ECMOAssessment assessment = new ECMOAssessment();
         assessment.setPatientId(patientId);
-        assessment.setRiskScore(riskScore);
-        
+        assessment.setRiskScore(BigDecimal.valueOf(riskScore));
+
         try {
             // 尝试解析JSON响应
             String cleanResponse = aiResponse.trim();
@@ -278,8 +279,8 @@ public class ECMOExpertService {
     private ECMOAssessment createDefaultAssessment(String patientId, Double riskScore) {
         ECMOAssessment assessment = new ECMOAssessment();
         assessment.setPatientId(patientId);
-        assessment.setRiskScore(riskScore);
-        
+        assessment.setRiskScore(BigDecimal.valueOf(riskScore));
+
         // 根据风险评分确定推荐结果
         boolean recommend = riskScore >= 60;
         assessment.setCanUseECMO(recommend);
@@ -462,7 +463,7 @@ public class ECMOExpertService {
         errorAssessment.setDiagnosis("系统评估异常，无法完成ECMO适应症分析");
         errorAssessment.setEvidence("系统技术故障: " + errorMessage + "。建议人工评估或重新提交患者数据");
         errorAssessment.setConfidence(0.0);
-        errorAssessment.setRiskScore(0.0);
+        errorAssessment.setRiskScore(BigDecimal.valueOf(0.0));
         errorAssessment.setRiskLevel("系统异常");
         errorAssessment.setRiskColor("gray");
         errorAssessment.setFinalRecommendation("请重新评估或咨询ECMO专科医生");
