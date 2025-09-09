@@ -30,6 +30,12 @@ public interface AssessmentHistoryRepository extends JpaRepository<AssessmentHis
     // 查找收藏的记录
     List<AssessmentHistory> findByUserIdAndIsFavoriteAndIsSavedOrderByAssessmentDateDesc(Long userId, Integer isFavorite, Integer isSaved);
 
+    // 添加统计方法
+    long countByAssessmentDateAfter(LocalDateTime dateTime);
+
+    @Query("SELECT COUNT(h) FROM AssessmentHistory h WHERE h.assessmentDate >= :startTime")
+    long countAssessmentsAfter(@Param("startTime") LocalDateTime startTime);
+
     // 统计用户的评估记录数量
     long countByUserIdAndIsSaved(Long userId, Integer isSaved);
 }
