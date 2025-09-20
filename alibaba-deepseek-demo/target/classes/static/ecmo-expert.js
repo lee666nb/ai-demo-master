@@ -12,22 +12,46 @@ class ECMOExpertSystem {
         this.userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
         this.userId = parseInt(localStorage.getItem('userId') || '0', 10) || null;
         this.avatarUrl = localStorage.getItem('avatarUrl') || '';
+        this.theme = localStorage.getItem('theme') || 'light';
 
         this.init();
     }
 
     init() {
+        this.initTheme();
         this.updateUsername();
         this.applyAvatar();
         this.bindEvents();
         this.loadKnowledge();
         this.setDefaultValues();
         this.loadAssessmentHistory();
+        this.refreshUserDropdown();
 
         // 如果默认显示介绍页面，立即初始化图表
         if (document.getElementById('introduction-section')?.classList.contains('active')) {
             this.delayedInitCharts();
         }
+
+        // 主题切换按钮
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => this.toggleTheme());
+        }
+
+        // 初次更新存储用量
+        this.updateStorageUsageBar();
+    }
+
+    initTheme() {
+        const isDark = this.theme === 'dark';
+        document.body.classList.toggle('theme-dark', isDark);
+    }
+
+    toggleTheme() {
+        const isDark = document.body.classList.toggle('theme-dark');
+        this.theme = isDark ? 'dark' : 'light';
+        localStorage.setItem('theme', this.theme);
+        this.showSuccess(`已切换为${isDark ? '深色' : '浅色'}主题`);
     }
 
     updateUsername() {
@@ -36,16 +60,32 @@ class ECMOExpertSystem {
             const name = this.userProfile.realName || this.currentUser || '医生用户';
             usernameEl.textContent = name;
         }
+        const dropName = document.getElementById('dropdownUsername');
+        if (dropName) {
+            dropName.textContent = this.userProfile.realName || this.currentUser || '医生用户';
+        }
     }
 
     applyAvatar() {
         const avatarEl = document.getElementById('userAvatar');
-        if (!avatarEl) return;
-        if (this.avatarUrl) {
-            avatarEl.style.backgroundImage = `url('${this.avatarUrl}')`;
-            avatarEl.style.backgroundSize = 'cover';
-            avatarEl.style.backgroundPosition = 'center';
-            avatarEl.textContent = '';
+        if (avatarEl) {
+            if (this.avatarUrl) {
+                avatarEl.style.backgroundImage = `url('${this.avatarUrl}')`;
+                avatarEl.style.backgroundSize = 'cover';
+                avatarEl.style.backgroundPosition = 'center';
+                avatarEl.textContent = '';
+            } else {
+                avatarEl.style.backgroundImage = '';
+            }
+        }
+        const dropdownAvatar = document.getElementById('dropdownAvatar');
+        if (dropdownAvatar) {
+            if (this.avatarUrl) {
+                dropdownAvatar.style.backgroundImage = `url('${this.avatarUrl}')`;
+                dropdownAvatar.textContent = '';
+            } else {
+                dropdownAvatar.style.backgroundImage = '';
+            }
         }
     }
 
@@ -112,6 +152,126 @@ class ECMOExpertSystem {
                     dropdown.classList.remove('show');
                 }
             });
+        }
+
+        // 新增：头像本地文件选择
+        const avatarFileInput = document.getElementById('profile-avatarFile');
+        if (avatarFileInput) {
+            avatarFileInput.addEventListener('change', (e) => {
+                const file = e.target && e.target.files && e.target.files[0];
+                if (file) this.onAvatarFileSelected(file);
+            });
+        }
+    }
+
+    // 新增：处理本地头像文件
+    onAvatarFileSelected(file) {
+        try {
+            const MAX_BYTES = 1 * 1024 * 1024; // 1MB 建议上限
+            if (!file.type || !file.type.startsWith('image/')) {
+                this.showError('请选择图片文件');
+                return;
+            }
+            if (file.size > MAX_BYTES) {
+                this.showError('图片过大，建议小于1MB');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const dataUrl = reader.result;
+                if (typeof dataUrl !== 'string') {
+                    this.showError('读取图片失败');
+                    return;
+                }
+                // 先更新到输入框，便于用户看到与编辑
+                const urlInput = document.getElementById('profile-avatarUrl');
+                if (urlInput) urlInput.value = dataUrl;
+                // 保存与预览
+                this.avatarUrl = dataUrl;
+                try {
+                    localStorage.setItem('avatarUrl', dataUrl);
+                } catch (e) {
+                    this.showError('本地存储空间不足，无法保存头像');
+                    return;
+                }
+                this.applyAvatar();
+                this.showSuccess('头像已更新');
+            };
+            reader.onerror = () => this.showError('读取图片失败');
+            reader.readAsDataURL(file);
+        } catch (e) {
+            console.error(e);
+            this.showError('设置头像失败');
+        }
+    }
+
+    // ====== 用户菜单填充 ======
+    refreshUserDropdown() {
+        // 更新用户名与头像
+        this.updateUsername();
+        this.applyAvatar();
+
+        // 统计信息
+        const total = this.assessmentHistory.length;
+        const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const weekAdd = this.assessmentHistory.filter(a => new Date(a.timestamp).getTime() >= weekAgo).length;
+        const patientSet = new Set(this.assessmentHistory.map(a => a.patientId || '未知'));
+        const patients = patientSet.size;
+        const setNum = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = String(v); };
+        setNum('statTotal', total);
+        setNum('statWeek', weekAdd);
+        setNum('statPatients', patients);
+
+        // 最近评估
+        const recentList = document.getElementById('dropdown-recent-list');
+        if (recentList) {
+            if (total === 0) {
+                recentList.innerHTML = '<div class="recent-empty">暂无记录</div>';
+            } else {
+                const top5 = this.assessmentHistory.slice(0, 5);
+                recentList.innerHTML = top5.map(a => {
+                    const score = Math.round(a.riskScore || 0);
+                    const badge = this.getRiskBadgeClass(score);
+                    const time = new Date(a.timestamp).toLocaleString('zh-CN');
+                    const pid = a.patientId || '未知患者';
+                    return `
+                        <div class="recent-item" onclick="window.ecmoSystem.viewAssessment('${a.id}')">
+                            <span class="recent-patient">${pid}</span>
+                            <span class="badge ${badge}">${this.getRiskLevel(score)}</span>
+                            <span class="recent-time">${time}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 存储用量
+        this.updateStorageUsageBar();
+    }
+
+    updateStorageUsageBar() {
+        const percent = this.getStorageUsagePercent();
+        const fill = document.getElementById('storage-usage-fill');
+        const text = document.getElementById('storage-usage-text');
+        if (fill) fill.style.width = `${percent}%`;
+        if (text) text.textContent = `${percent}%`;
+    }
+
+    getStorageUsagePercent() {
+        try {
+            // 估算 localStorage 字节数（UTF-16 每字符2字节简化）
+            let totalChars = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                const v = localStorage.getItem(k) || '';
+                totalChars += (k.length + v.length);
+            }
+            const bytes = totalChars * 2;
+            const quota = 5 * 1024 * 1024; // 5MB 近似
+            const pct = Math.min(100, Math.round((bytes / quota) * 100));
+            return isFinite(pct) ? pct : 0;
+        } catch (_) {
+            return 0;
         }
     }
 
@@ -195,6 +355,7 @@ class ECMOExpertSystem {
         }
 
         this.closeModalById('profile-modal');
+        this.refreshUserDropdown();
     }
 
     openPasswordModal() {
@@ -238,6 +399,29 @@ class ECMOExpertSystem {
         }
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+    }
+
+    openHelp() {
+        this.showNotification('帮助：左侧导航可进入各功能；右上角下拉可编辑资料、切换主题与查看最近评估。', 'info');
+    }
+
+    openShortcuts() {
+        this.showNotification('快捷键：Alt+1 评估，Alt+2 历史，Alt+3 知识库，Alt+4 快速评估，Alt+5 介绍', 'info');
+        // 可选：绑定一次全局快捷键
+        if (!this._shortcutsBound) {
+            this._shortcutsBound = true;
+            window.addEventListener('keydown', (e) => {
+                if (!e.altKey) return;
+                switch (e.key) {
+                    case '1': return this.showSection('assessment');
+                    case '2': return this.showSection('history');
+                    case '3': return this.showSection('knowledge');
+                    case '4': return this.showSection('quick');
+                    case '5': return this.showSection('introduction');
+                    default: return;
+                }
+            });
+        }
     }
 
     markAllRead() {
@@ -748,18 +932,33 @@ class ECMOExpertSystem {
                 body: JSON.stringify(formData)
             });
 
-            const result = await response.json();
+            // 优先检查HTTP状态
+            if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                this.showError(`评估失败(${response.status})：${text || '服务器返回错误'}`);
+                return;
+            }
 
-            if (result.success) {
+            // 尝试按JSON解析，失败则给出可读信息
+            let result;
+            try {
+                result = await response.json();
+            } catch (e) {
+                const text = await response.text().catch(() => '');
+                this.showError(`评估结果解析失败：${text || '请稍后重试'}`);
+                return;
+            }
+
+            if (result && result.success) {
                 this.currentAssessment = result;
                 this.displayAssessmentResult(result);
                 this.showModal();
             } else {
-                this.showError('评估失败: ' + (result.message || '未知错误'));
+                this.showError('评估失败: ' + (result?.message || '未知错误'));
             }
         } catch (error) {
             console.error('评估请求失败:', error);
-            this.showError('网络连接失败，请检查网络连接后重试');
+            this.showError('网络连接失败，请检查网络后重试');
         } finally {
             this.hideLoading();
         }
@@ -769,15 +968,15 @@ class ECMOExpertSystem {
     async handleQuickAssessment() {
         const formData = this.getFormData('quick-form');
 
-        // 填充必要字段的默认值
+        // 填充必要字段默认值
         formData.patientId = formData.patientId || `QUICK_${Date.now()}`;
         formData.heartRate = formData.heartRate || 100;
         formData.systolicBP = formData.systolicBP || 90;
         formData.diastolicBP = formData.diastolicBP || 60;
         formData.respiratoryRate = formData.respiratoryRate || 25;
-        formData.ph = formData.ph || 7.25;
-        formData.paCO2 = formData.paCO2 || 45;
-        formData.paO2 = formData.paO2 || formData.po2;
+        formData.ph = formData.ph ?? 7.25;
+        formData.paCO2 = formData.paCO2 ?? formData.pco2 ?? 45;
+        formData.paO2 = formData.paO2 ?? formData.po2;
 
         const quickBtn = document.getElementById('quick-assess-btn');
         if (quickBtn) {
@@ -792,16 +991,29 @@ class ECMOExpertSystem {
                 body: JSON.stringify(formData)
             });
 
-            const result = await response.json();
+            if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                this.showError(`快速评估失败(${response.status})：${text || '服务器返回错误'}`);
+                return;
+            }
 
-            if (result.success) {
+            let result;
+            try {
+                result = await response.json();
+            } catch (e) {
+                const text = await response.text().catch(() => '');
+                this.showError(`快速评估结果解析失败：${text || '请稍后重试'}`);
+                return;
+            }
+
+            if (result && result.success) {
                 this.displayQuickResult(result);
             } else {
-                this.showError('快速评估失败: ' + (result.message || '未知错误'));
+                this.showError('快速评估失败: ' + (result?.message || '未知错误'));
             }
         } catch (error) {
             console.error('快速评估失败:', error);
-            this.showError('网络连接失败，请检查网络连接后重试');
+            this.showError('网络连接失败，请检查网络后重试');
         } finally {
             if (quickBtn) {
                 quickBtn.innerHTML = '<i class="icon-zap"></i> 快速评估';
@@ -938,6 +1150,37 @@ class ECMOExpertSystem {
         else return '#F44336';
     }
 
+    // ====== 新增：风险文案与样式工具 ======
+    getRiskLevel(score = 0) {
+        const s = Number(score) || 0;
+        if (s >= 80) return '极高风险';
+        if (s >= 60) return '高风险';
+        if (s >= 40) return '中等风险';
+        return '低风险';
+    }
+
+    getRiskBadgeClass(score = 0) {
+        const s = Number(score) || 0;
+        if (s >= 80) return 'badge-extreme';
+        if (s >= 60) return 'badge-high';
+        if (s >= 40) return 'badge-medium';
+        return 'badge-low';
+    }
+
+    getRiskClass(score = 0) {
+        const s = Number(score) || 0;
+        if (s >= 80) return 'risk-extreme';
+        if (s >= 60) return 'risk-high';
+        if (s >= 40) return 'risk-medium';
+        return 'risk-low';
+    }
+
+    // ====== 新增：知识库加载（当前为静态内容占位，避免未定义） ======
+    loadKnowledge() {
+        // 页面知识库为静态HTML，保留占位以避免未定义错误
+        return;
+    }
+
     populateList(listId, items) {
         const list = document.getElementById(listId);
         if (list && Array.isArray(items) && items.length > 0) {
@@ -991,7 +1234,8 @@ class ECMOExpertSystem {
             if (['age', 'weight', 'height', 'heartRate', 'systolicBP', 'diastolicBP',
                  'temperature', 'respiratoryRate', 'oxygenSaturation', 'ph', 'pco2',
                  'po2', 'hco3', 'lactate', 'ejectionFraction', 'glasgowComaScale'].includes(key)) {
-                data[key] = parseFloat(value) || null;
+                const num = parseFloat(value);
+                data[key] = isNaN(num) ? null : num;
             } else if (['onVentilator', 'onVasopressors'].includes(key)) {
                 data[key] = value === 'true';
             } else {
@@ -999,9 +1243,11 @@ class ECMOExpertSystem {
             }
         }
 
-        if (data.pco2) data.paCO2 = data.pco2;
-        if (data.po2) data.paO2 = data.po2;
-        if (data.hco3) data.bicarbonate = data.hco3;
+        // 字段兼容映射（后端实体命名）
+        if (data.pco2 != null) data.paCO2 = data.pco2;
+        if (data.po2 != null) data.paO2 = data.po2;
+        if (data.hco3 != null) data.bicarbonate = data.hco3;
+        if (data.ph != null) data.pH = data.ph; // 兼容后端 PatientParameters.pH
 
         return data;
     }
@@ -1034,6 +1280,7 @@ class ECMOExpertSystem {
 
         localStorage.setItem('ecmoAssessments', JSON.stringify(this.assessmentHistory));
         this.loadAssessmentHistory();
+        this.refreshUserDropdown();
         this.showSuccess('评估结果已保存');
         this.closeModal();
     }
@@ -1043,6 +1290,7 @@ class ECMOExpertSystem {
             this.assessmentHistory = this.assessmentHistory.filter(assessment => assessment.id !== assessmentId);
             localStorage.setItem('ecmoAssessments', JSON.stringify(this.assessmentHistory));
             this.loadAssessmentHistory();
+            this.refreshUserDropdown();
             this.showSuccess('评估记录已删除');
         }
     }
@@ -1060,6 +1308,7 @@ class ECMOExpertSystem {
                     <p>暂无评估记录</p>
                 </div>
             `;
+            this.refreshUserDropdown();
             return;
         }
 
@@ -1107,79 +1356,8 @@ class ECMOExpertSystem {
                 </div>
             `;
         }).join('');
-    }
 
-    getRiskClass(score) {
-        if (score >= 80) return 'low-risk';
-        else if (score >= 60) return 'medium-risk';
-        else if (score >= 40) return 'high-risk';
-        else return 'extreme-risk';
-    }
-
-    getRiskBadgeClass(score) {
-        if (score >= 80) return 'low';
-        else if (score >= 60) return 'medium';
-        else if (score >= 40) return 'high';
-        else return 'extreme';
-    }
-
-    getRiskLevel(score) {
-        if (score >= 80) return '低风险';
-        else if (score >= 60) return '中等风险';
-        else if (score >= 40) return '高风险';
-        else return '极高风险';
-    }
-
-    viewAssessment(assessmentId) {
-        const assessment = this.assessmentHistory.find(a => a.id === assessmentId);
-        if (assessment) {
-            // 修复数据访问问题 - 直接使用assessment对象，不是assessment.data
-            this.currentAssessment = assessment;
-
-            // 创建适合displayAssessmentResult的数据结构
-            const resultData = {
-                ecmoResult: assessment.result || '评估结果不可用',
-                diagnosis: assessment.diagnosis || assessment.primaryDiagnosis || '诊断信息不可用',
-                evidence: assessment.evidence || `基于患者年龄${assessment.age}岁、主要诊断等综合评估`,
-                riskAssessment: {
-                    riskScore: assessment.riskScore || 0,
-                    riskLevel: this.getRiskLevel(assessment.riskScore || 0),
-                    riskColor: this.getRiskBadgeClass(assessment.riskScore || 0),
-                    keyRiskFactors: assessment.keyRiskFactors || ['基于临床参数的综合评估']
-                },
-                confidence: (assessment.confidence || 85) / 100, // 转换为0-1范围
-                decisionCard: {
-                    supportReasons: assessment.supportReasons || ['符合ECMO适应症标准'],
-                    opposeReasons: assessment.opposeReasons || ['需要权衡获益风险比'],
-                    guidelineReferences: assessment.guidelines || {}
-                },
-                recommendations: assessment.recommendations || ['请咨询ECMO专科医生进行详细评估'],
-                detailedScores: assessment.detailedScores || {}
-            };
-
-            this.displayAssessmentResult(resultData);
-            this.showModal();
-        } else {
-            this.showError('找不到该评估记录');
-        }
-    }
-
-    // 添加缺失的showModal函数
-    showModal() {
-        const modal = document.getElementById('result-modal');
-        if (modal) {
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // 防止背景滚动
-        }
-    }
-
-    // 修复closeModal函数
-    closeModal() {
-        const modal = document.getElementById('result-modal');
-        if (modal) {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // 恢复背景滚动
-        }
+        this.refreshUserDropdown();
     }
 
     // 搜索历史记录功能
@@ -1311,73 +1489,8 @@ class ECMOExpertSystem {
             this.filteredHistory = [];
             localStorage.setItem('ecmoAssessments', JSON.stringify(this.assessmentHistory));
             this.loadAssessmentHistory();
+            this.refreshUserDropdown();
             this.showSuccess('所有历史记录已清空');
-        }
-    }
-
-    // 导出评估记录（可选功能）
-    exportAssessment(assessmentId) {
-        const assessment = this.assessmentHistory.find(a => a.id === assessmentId);
-        if (assessment) {
-            const exportData = {
-                patientId: assessment.patientId,
-                timestamp: assessment.timestamp,
-                result: assessment.result,
-                diagnosis: assessment.diagnosis,
-                riskScore: assessment.riskScore,
-                confidence: assessment.confidence,
-                detailedData: assessment.data
-            };
-
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ECMO评估报告_${assessment.patientId}_${new Date(assessment.timestamp).toLocaleDateString()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            this.showSuccess('评估报告已导出');
-        }
-    }
-
-    // 完善知识库加载功能
-    loadKnowledge() {
-        const indicationsList = document.getElementById('indications-list');
-        const contraindicationsList = document.getElementById('contraindications-list');
-
-        if (indicationsList) {
-            indicationsList.innerHTML = `
-                <li>严重急性呼吸衰竭: P/F比 < 80，PEEP ≥ 10cmH2O，持续6小时以上</li>
-                <li>心源性休克: 药物支持下仍有血流动力学不稳定</li>
-                <li>急性心肌炎伴心源性休克</li>
-                <li>可逆性心肺疾病的桥接治疗</li>
-                <li>心脏骤停后的神经保护</li>
-                <li>高危心脏手术的预防性支持</li>
-            `;
-        }
-
-        if (contraindicationsList) {
-            contraindicationsList.innerHTML = `
-                <li>不可逆转的严重脑损伤</li>
-                <li>晚期恶性肿瘤</li>
-                <li>严重免疫缺陷</li>
-                <li>不可控制的出血</li>
-                <li>严重多器官功能衰竭超过7天</li>
-                <li>年龄>75岁（相对禁忌症）</li>
-            `;
-        }
-    }
-
-    // 重置表单功能
-    resetForm() {
-        const form = document.getElementById('ecmo-form');
-        if (form) {
-            form.reset();
-            this.setDefaultValues();
-            this.showSuccess('表单已重置');
         }
     }
 
@@ -1475,6 +1588,33 @@ class ECMOExpertSystem {
             }
         });
     }
+
+    // ====== 新增：显示评估结果模态框 ======
+    showModal() {
+        const modal = document.getElementById('result-modal');
+        if (modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    // ====== 新增：从历史记录查看评估 ======
+    viewAssessment(assessmentId) {
+        try {
+            const item = (this.assessmentHistory || []).find(a => String(a.id) === String(assessmentId));
+            if (!item) {
+                this.showError('未找到该评估记录');
+                return;
+            }
+            const data = item.data || item; // 兼容旧格式
+            this.currentAssessment = data;
+            this.displayAssessmentResult(data);
+            this.showModal();
+        } catch (e) {
+            this.showError('打开评估报告失败');
+            console.error(e);
+        }
+    }
 }
 
 // 全局函数
@@ -1512,6 +1652,19 @@ function logout() {
 function deleteAssessment(assessmentId) {
     if (window.ecmoSystem) {
         window.ecmoSystem.deleteAssessment(assessmentId);
+    }
+}
+
+// 新增：给按钮调用的全局搜索/筛选函数
+function searchHistory() {
+    if (window.ecmoSystem) {
+        window.ecmoSystem.searchHistory();
+    }
+}
+
+function filterHistory() {
+    if (window.ecmoSystem) {
+        window.ecmoSystem.filterHistory();
     }
 }
 

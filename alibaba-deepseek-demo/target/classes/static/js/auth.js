@@ -109,7 +109,12 @@ class AuthManager {
             const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type':'application/json'}, body: JSON.stringify({ username, password, rememberMe }) });
             const result = await response.json();
             if (result.success) {
-                this.saveUserSession(result, rememberMe);
+                const user = result.user || result; // 兼容不同返回结构
+                this.saveUserSession(user, rememberMe);
+                // 同步给其它页面使用
+                localStorage.setItem('username', user.realName || user.username || '医生用户');
+                if (user.avatarUrl) localStorage.setItem('avatarUrl', user.avatarUrl);
+
                 this.showMessage('登录成功，正在跳转...', 'success');
                 setTimeout(()=>{ window.location.href = '/ecmo-expert.html'; }, 800);
             } else {
@@ -149,8 +154,8 @@ class AuthManager {
                 // 显示成功消息
                 this.showMessage('注册成功！请登录', 'success');
 
-                // 延迟跳转到登录页面
-                setTimeout(()=>{ window.location.href = '/login'; },1500);
+                // 延迟跳转到登录页面（改为静态页，避免视图循环）
+                setTimeout(()=>{ window.location.href = '/login.html'; },1500);
             } else {
                 this.showMessage(result.message || '注册失败，请稍后重试', 'error');
             }
@@ -347,7 +352,7 @@ class AuthManager {
         storage.setItem('userInfo', JSON.stringify({
             username: userData.username,
             email: userData.email,
-            avatar: userData.avatar || '/image/1.jpg', // 修正路径
+            avatar: userData.avatarUrl || userData.avatar || '/image/1.jpg', // 优先后端 avatarUrl
             loginTime: new Date().toISOString()
         }));
     }

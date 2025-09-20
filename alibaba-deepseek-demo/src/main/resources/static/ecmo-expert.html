@@ -22,10 +22,54 @@
                         <span class="chevron">▾</span>
                     </div>
                     <div class="user-dropdown" id="userDropdown" role="menu">
+                        <!-- 用户概览 -->
+                        <div class="dropdown-section dropdown-header">
+                            <div class="dropdown-avatar" id="dropdownAvatar">👨‍⚕️</div>
+                            <div class="dropdown-user-meta">
+                                <div class="dropdown-username" id="dropdownUsername">医生用户</div>
+                                <button class="dropdown-link" onclick="window.ecmoSystem.openProfileModal()">编辑资料</button>
+                            </div>
+                        </div>
+                        <!-- 快速统计 -->
+                        <div class="dropdown-section dropdown-stats">
+                            <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">评估总数</div></div>
+                            <div class="stat"><div class="stat-num" id="statWeek">0</div><div class="stat-label">本周新增</div></div>
+                            <div class="stat"><div class="stat-num" id="statPatients">0</div><div class="stat-label">患者数</div></div>
+                        </div>
+                        <!-- 快捷操作 -->
+                        <div class="dropdown-section dropdown-quick-actions">
+                            <button class="qa-item" onclick="showSection('assessment')">新建评估</button>
+                            <button class="qa-item" onclick="showSection('quick')">快速评估</button>
+                            <button class="qa-item" onclick="showSection('history')">评估历史</button>
+                            <button class="qa-item" onclick="showSection('knowledge')">诊疗数据库</button>
+                            <button class="qa-item" onclick="showSection('introduction')">ECMO介绍</button>
+                            <a class="qa-item" href="/admin.html">后台管理</a>
+                        </div>
+                        <!-- 主题与存储 -->
+                        <div class="dropdown-section dropdown-utils">
+                            <div class="theme-row">
+                                <span>主题</span>
+                                <button id="themeToggle" class="theme-toggle" aria-label="切换主题"><span class="knob"></span></button>
+                            </div>
+                            <div class="usage-row">
+                                <span>本地存储</span>
+                                <div class="usage-bar"><div id="storage-usage-fill" class="usage-fill" style="width:0%"></div></div>
+                                <span id="storage-usage-text" class="usage-text">0%</span>
+                            </div>
+                        </div>
+                        <!-- 最近评估 -->
+                        <div class="dropdown-section dropdown-recent">
+                            <div class="dropdown-subtitle">最近评估</div>
+                            <div id="dropdown-recent-list" class="recent-list">
+                                <div class="recent-empty">暂无记录</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="window.ecmoSystem.openProfileModal()">个人资料</button>
                         <button class="dropdown-item" onclick="window.ecmoSystem.openPasswordModal()">修改密码</button>
                         <button class="dropdown-item" onclick="window.ecmoSystem.openNotifications()">通知</button>
-                        <a class="dropdown-item" href="/admin.html">后台管理</a>
+                        <button class="dropdown-item" onclick="window.ecmoSystem.openHelp()">帮助与文档</button>
+                        <button class="dropdown-item" onclick="window.ecmoSystem.openShortcuts()">键盘快捷键</button>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item danger" onclick="logout()">退出登录</button>
                     </div>
@@ -337,7 +381,7 @@
                                             <li>年龄 > 75岁</li>
                                             <li>机械通气 > 7天</li>
                                             <li>多器官功能衰竭 > 48小时</li>
-                                            <li>不可逆性��经系统疾病</li>
+                                            <li>不可逆性经系统疾病</li>
                                             <li>严重外周血管疾病</li>
                                             <li>严重肥胖(BMI > 40)</li>
                                         </ul>
@@ -441,7 +485,7 @@
                                         <p><strong>发生率:</strong> 30-50%</p>
                                         <ul>
                                             <li>颅内出血: 最严重，发生率3-8%</li>
-                                            <li>胃肠道出血: 常见，需���内镜检查</li>
+                                            <li>胃肠道出血: 常见，需内镜检查</li>
                                             <li>插管部位出血: 局部压迫止血</li>
                                             <li>手术部位出血: 可能需要再次手术</li>
                                         </ul>
@@ -471,7 +515,7 @@
                                         <p><strong>发生率:</strong> 15-25%</p>
                                         <ul>
                                             <li>导管相关血流感染: 最常见</li>
-                                            <li>呼吸机相关肺炎: VAP风险增���</li>
+                                            <li>呼吸机相关肺炎: VAP风险增</li>
                                             <li>泌尿系感染: 留置导尿管所致</li>
                                             <li>手术切口感染: 免疫功能下降</li>
                                         </ul>
@@ -881,7 +925,7 @@
                                         <li>🏥 具备ECMO资质的医疗机构</li>
                                         <li>👨‍⚕️ 经过专业培训的多学科团队</li>
                                         <li>🔧 完善的设备和监测条件</li>
-                                        <li>📋 严格的���量控制和管理流程</li>
+                                        <li>📋 严格的质量控制和管理流程</li>
                                         <li>💬 充分的患者和家属沟通</li>
                                     </ul>
                                     <p><strong>ECMO的启动应该基于严格的适应症评估，并充分权衡获益风险比。</strong></p>
@@ -1054,6 +1098,11 @@
                         <div class="form-group full-width">
                             <label>头像URL</label>
                             <input type="text" id="profile-avatarUrl" placeholder="https://...">
+                            <div style="margin-top:8px; display:flex; align-items:center; gap:8px;">
+                                <input type="file" id="profile-avatarFile" accept="image/*" style="display:none;" />
+                                <button type="button" class="btn-secondary" onclick="document.getElementById('profile-avatarFile').click()">选择本地图片</button>
+                                <span style="color:#64748b;font-size:12px;">支持jpg/png/gif，建议小于1MB</span>
+                            </div>
                         </div>
                     </div>
                 </form>

@@ -30,6 +30,8 @@
     align-items: center;
     justify-content: center;
     border: 1px solid rgba(44, 90, 160, 0.2);
+    background-size: cover;
+    background-position: center;
 }
 .user-trigger .chevron {
     color: #6b7280;
@@ -39,14 +41,16 @@
     position: absolute;
     right: 0;
     top: calc(100% + 8px);
-    min-width: 180px;
+    min-width: 280px;
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.18);
     padding: 0.5rem;
     display: none;
-    z-index: 1001;
+    z-index: 10000; /* 提升层级，避免被覆盖 */
+    max-height: 50vh; /* 更短一些 */
+    overflow-y: auto;
 }
 .user-dropdown.show { display: block; }
 .dropdown-item {
@@ -71,6 +75,53 @@
     background: #f1f5f9;
     margin: 0.5rem 0;
 }
+
+/* 下拉分区 */
+.dropdown-section { padding: 0.5rem; }
+.dropdown-header { display: flex; align-items: center; gap: 10px; padding: 0.5rem; }
+.dropdown-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f3f4f6; display:flex; align-items:center; justify-content:center; border:1px solid #e5e7eb; background-size: cover; background-position: center; }
+.dropdown-user-meta { display: flex; flex-direction: column; }
+.dropdown-username { font-weight: 700; color: #111827; }
+.dropdown-link { background: transparent; border:none; color:#3b82f6; cursor:pointer; padding:0; text-align:left; font-size: 12px; }
+.dropdown-link:hover { text-decoration: underline; }
+
+/* 统计 */
+.dropdown-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0.5rem; }
+.dropdown-stats .stat { background:#f8fafc; border:1px solid #eef2f7; border-radius:10px; padding:8px; text-align:center; }
+.dropdown-stats .stat-num { font-weight:800; color:#1f2937; font-size: 16px; }
+.dropdown-stats .stat-label { color:#6b7280; font-size:12px; margin-top:2px; }
+
+/* 快捷操作网格 */
+.dropdown-quick-actions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; padding: 0.5rem; }
+.qa-item { background:#eef2ff; color:#3730a3; border:1px solid #e0e7ff; border-radius:8px; padding:8px 10px; font-weight:600; cursor:pointer; text-align:center; text-decoration:none; display:block; }
+.qa-item:hover { background:#e0e7ff; }
+
+/* 工具行：主题和存储 */
+.dropdown-utils { display:flex; flex-direction:column; gap:10px; padding: 0.5rem; }
+.theme-row, .usage-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.theme-toggle { width:48px; height:24px; border-radius:999px; background:#e5e7eb; border:1px solid #d1d5db; position:relative; cursor:pointer; padding:0; }
+.theme-toggle .knob { position:absolute; top:2px; left:2px; width:20px; height:20px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.2); transition: all .2s ease; }
+body.theme-dark .theme-toggle { background:#111827; border-color:#374151; }
+body.theme-dark .theme-toggle .knob { transform: translateX(24px); background:#f9fafb; }
+
+.usage-bar { flex:1; height:8px; background:#f1f5f9; border-radius:999px; overflow:hidden; margin:0 8px; }
+.usage-fill { height:100%; background:linear-gradient(90deg,#34d399,#3b82f6); width:0%; transition:width .3s ease; }
+.usage-text { font-size:12px; color:#6b7280; min-width: 36px; text-align:right; }
+
+/* 最近评估 */
+.dropdown-recent { padding: 0.5rem; }
+.dropdown-subtitle { font-size:12px; color:#6b7280; margin:4px 0 8px; }
+.recent-list { display:flex; flex-direction:column; gap:6px; }
+.recent-item { display:flex; align-items:center; gap:8px; padding:8px; border:1px solid #eef2f7; background:#ffffff; border-radius:8px; cursor:pointer; }
+.recent-item:hover { background:#f9fafb; }
+.recent-patient { font-weight:700; color:#111827; }
+.recent-time { font-size:12px; color:#6b7280; margin-left:auto; }
+.badge { font-size: 11px; padding:2px 6px; border-radius:999px; border:1px solid #e5e7eb; }
+.badge.low { background:#ecfdf5; color:#065f46; border-color:#a7f3d0; }
+.badge.medium { background:#fffbeb; color:#92400e; border-color:#fde68a; }
+.badge.high { background:#fff1f2; color:#9f1239; border-color:#fecdd3; }
+.badge.extreme { background:#fee2e2; color:#7f1d1d; border-color:#fecaca; }
+.recent-empty { color:#9ca3af; font-size:12px; text-align:center; padding:6px 0; }
 
 /* 通知/加载/提示的基础样式补充 */
 .notification {
@@ -111,6 +162,20 @@ body {
     color: #333;
 }
 
+/* 暗色主题基础 */
+body.theme-dark { background: linear-gradient(135deg, #0b1220 0%, #0f1830 100%); color: #e5e7eb; }
+body.theme-dark .header { background: rgba(17, 24, 39, 0.8); border-bottom-color: rgba(255,255,255,0.08); }
+body.theme-dark .sidebar, body.theme-dark .content { background: rgba(17, 24, 39, 0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+body.theme-dark .nav-item { color: #9ca3af; }
+body.theme-dark .nav-item:hover { background: #111827; color: #e5e7eb; }
+body.theme-dark .nav-item.active { background: linear-gradient(135deg, #334155, #1f2937); }
+body.theme-dark .user-dropdown { background:#111827; border-color:#1f2937; }
+body.theme-dark .dropdown-item { color:#e5e7eb; }
+body.theme-dark .dropdown-item:hover { background:#0f172a; }
+body.theme-dark .dropdown-stats .stat { background:#0f172a; border-color:#1f2937; }
+body.theme-dark .dropdown-username { color:#e5e7eb; }
+body.theme-dark .qa-item { background:#0f172a; border-color:#1f2937; color:#93c5fd; }
+
 .container {
     display: flex;
     flex-direction: column;
@@ -124,6 +189,8 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1rem 2rem;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 5000;
 }
 
 .header-content {
@@ -396,6 +463,7 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
+    z-index: 20000; /* 保证盖过header和下拉 */
 }
 
 .modal-content {
@@ -411,6 +479,8 @@ body {
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
     animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
+    position: relative;
+    z-index: 20001;
 }
 
 @keyframes modalSlideIn {
@@ -852,7 +922,7 @@ body {
 }
 
 .oppose-section li:before {
-    content: "!";
+    content: "！";
     position: absolute;
     left: 0;
     color: #e17055;
@@ -1199,7 +1269,7 @@ body {
 /* 参数监测网格 */
 .parameters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
     margin-top: 1.5rem;
 }
