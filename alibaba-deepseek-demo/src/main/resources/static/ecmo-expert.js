@@ -8,11 +8,17 @@ class ECMOExpertSystem {
         this.chartsInitialized = false; // 标记图表是否已初始化
         this.filteredHistory = [...this.assessmentHistory]; // 初始化时显示所有历史记录
 
+        // 新增：用户相关缓存
+        this.userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+        this.userId = parseInt(localStorage.getItem('userId') || '0', 10) || null;
+        this.avatarUrl = localStorage.getItem('avatarUrl') || '';
+
         this.init();
     }
 
     init() {
         this.updateUsername();
+        this.applyAvatar();
         this.bindEvents();
         this.loadKnowledge();
         this.setDefaultValues();
@@ -27,7 +33,19 @@ class ECMOExpertSystem {
     updateUsername() {
         const usernameEl = document.getElementById('username');
         if (usernameEl) {
-            usernameEl.textContent = this.currentUser;
+            const name = this.userProfile.realName || this.currentUser || '医生用户';
+            usernameEl.textContent = name;
+        }
+    }
+
+    applyAvatar() {
+        const avatarEl = document.getElementById('userAvatar');
+        if (!avatarEl) return;
+        if (this.avatarUrl) {
+            avatarEl.style.backgroundImage = `url('${this.avatarUrl}')`;
+            avatarEl.style.backgroundSize = 'cover';
+            avatarEl.style.backgroundPosition = 'center';
+            avatarEl.textContent = '';
         }
     }
 
@@ -67,21 +85,188 @@ class ECMOExpertSystem {
             historySearch.addEventListener('input', () => this.searchHistory());
         }
 
-        // 模态框关闭事件
+        // 模态框关闭事件（点击遮罩关闭）
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                this.closeModal();
+            if (e.target.classList?.contains('modal')) {
+                this.closeModalByEl(e.target);
             }
         });
 
         // ESC键关闭模态框
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                this.closeModal();
+                this.closeAllModals();
             }
         });
+
+        // 新增：用户菜单交互
+        const trigger = document.getElementById('userMenuTrigger');
+        const dropdown = document.getElementById('userDropdown');
+        if (trigger && dropdown) {
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
     }
 
+    // ====== 用户菜单-功能 ======
+    openProfileModal() {
+        const modal = document.getElementById('profile-modal');
+        if (!modal) return;
+        // 回填数据
+        document.getElementById('profile-username')?.setAttribute('value', this.currentUser);
+        document.getElementById('profile-realName')?.setAttribute('value', this.userProfile.realName || '');
+        document.getElementById('profile-department')?.setAttribute('value', this.userProfile.department || '');
+        document.getElementById('profile-title')?.setAttribute('value', this.userProfile.title || '');
+        document.getElementById('profile-hospital')?.setAttribute('value', this.userProfile.hospital || '');
+        document.getElementById('profile-phone')?.setAttribute('value', this.userProfile.phone || '');
+        document.getElementById('profile-email')?.setAttribute('value', this.userProfile.email || '');
+        document.getElementById('profile-avatarUrl')?.setAttribute('value', this.avatarUrl || '');
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    async saveProfile() {
+        // 读取表单数据
+        const profile = {
+            realName: document.getElementById('profile-realName')?.value?.trim() || '',
+            department: document.getElementById('profile-department')?.value?.trim() || '',
+            title: document.getElementById('profile-title')?.value?.trim() || '',
+            hospital: document.getElementById('profile-hospital')?.value?.trim() || '',
+            phone: document.getElementById('profile-phone')?.value?.trim() || '',
+            email: document.getElementById('profile-email')?.value?.trim() || '',
+            avatarUrl: document.getElementById('profile-avatarUrl')?.value?.trim() || ''
+        };
+
+        // 本地缓存立即生效
+        this.userProfile = { ...this.userProfile, ...profile };
+        localStorage.setItem('userProfile', JSON.stringify(this.userProfile));
+        if (profile.avatarUrl) {
+            this.avatarUrl = profile.avatarUrl;
+            localStorage.setItem('avatarUrl', this.avatarUrl);
+            this.applyAvatar();
+        }
+        if (profile.realName) {
+            localStorage.setItem('username', profile.realName);
+            this.currentUser = profile.realName;
+            this.updateUsername();
+        }
+
+        // 如果有后端 userId，则尝试调用后端接口（存在则更新，不存在则忽略错误）
+        if (this.userId) {
+            try {
+                this.showLoading('正在保存个人资料...');
+                const resp = await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: this.userId,
+                        realName: profile.realName,
+                        department: profile.department,
+                        title: profile.title,
+                        hospital: profile.hospital,
+                        phone: profile.phone,
+                        email: profile.email
+                    })
+                });
+                await resp.json().catch(() => ({}));
+                // 尝试更新头像（如果填写了）
+                if (profile.avatarUrl) {
+                    await fetch('/api/avatar/update', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: this.userId, avatarUrl: profile.avatarUrl })
+                    }).catch(() => {});
+                }
+                this.showSuccess('个人资料已保存');
+            } catch (e) {
+                this.showError('后端未提供资料更新接口，已保存到本地');
+            } finally {
+                this.hideLoading();
+            }
+        } else {
+            this.showSuccess('个人资料已保存（本地）');
+        }
+
+        this.closeModalById('profile-modal');
+    }
+
+    openPasswordModal() {
+        const modal = document.getElementById('password-modal');
+        if (!modal) return;
+        document.getElementById('pwd-current').value = '';
+        document.getElementById('pwd-new').value = '';
+        document.getElementById('pwd-confirm').value = '';
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    async savePassword() {
+        const current = document.getElementById('pwd-current')?.value || '';
+        const pwd = document.getElementById('pwd-new')?.value || '';
+        const confirmPwd = document.getElementById('pwd-confirm')?.value || '';
+
+        if (pwd.length < 6) {
+            this.showError('新密码长度至少6位');
+            return;
+        }
+        if (pwd !== confirmPwd) {
+            this.showError('两次输入的新密码不一致');
+            return;
+        }
+
+        // 当前后端未提供修改密码接口，执行本地提示
+        this.showSuccess('密码已更新（示例）');
+        this.closeModalById('password-modal');
+    }
+
+    openNotifications() {
+        const modal = document.getElementById('notice-modal');
+        const list = document.getElementById('notice-list');
+        if (!modal || !list) return;
+        const notices = JSON.parse(localStorage.getItem('ecmoNotices') || '[]');
+        if (notices.length === 0) {
+            list.innerHTML = '<div class="guideline-item">暂无新通知</div>';
+        } else {
+            list.innerHTML = notices.map(n => `<div class="guideline-item"><strong>${n.title || '通知'}</strong>：${n.content || ''}<div style="color:#64748b;font-size:12px;margin-top:4px;">${n.time || ''}</div></div>`).join('');
+        }
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    markAllRead() {
+        localStorage.setItem('ecmoNotices', '[]');
+        this.showSuccess('通知已全部标记为已读');
+        this.closeModalById('notice-modal');
+    }
+
+    closeModalById(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    closeModalByEl(modalEl) {
+        if (modalEl) {
+            modalEl.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    closeAllModals() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.body.style.overflow = 'auto';
+    }
+
+    // ====== 页面切换与图表 ======
     showSection(sectionName) {
         // 隐藏所有区域
         document.querySelectorAll('.section').forEach(section => {
@@ -858,7 +1043,7 @@ class ECMOExpertSystem {
             this.assessmentHistory = this.assessmentHistory.filter(assessment => assessment.id !== assessmentId);
             localStorage.setItem('ecmoAssessments', JSON.stringify(this.assessmentHistory));
             this.loadAssessmentHistory();
-            this.showSuccess('��估记录已删除');
+            this.showSuccess('评估记录已删除');
         }
     }
 
@@ -948,9 +1133,52 @@ class ECMOExpertSystem {
     viewAssessment(assessmentId) {
         const assessment = this.assessmentHistory.find(a => a.id === assessmentId);
         if (assessment) {
-            this.currentAssessment = assessment.data;
-            this.displayAssessmentResult(assessment.data);
+            // 修复数据访问问题 - 直接使用assessment对象，不是assessment.data
+            this.currentAssessment = assessment;
+
+            // 创建适合displayAssessmentResult的数据结构
+            const resultData = {
+                ecmoResult: assessment.result || '评估结果不可用',
+                diagnosis: assessment.diagnosis || assessment.primaryDiagnosis || '诊断信息不可用',
+                evidence: assessment.evidence || `基于患者年龄${assessment.age}岁、主要诊断等综合评估`,
+                riskAssessment: {
+                    riskScore: assessment.riskScore || 0,
+                    riskLevel: this.getRiskLevel(assessment.riskScore || 0),
+                    riskColor: this.getRiskBadgeClass(assessment.riskScore || 0),
+                    keyRiskFactors: assessment.keyRiskFactors || ['基于临床参数的综合评估']
+                },
+                confidence: (assessment.confidence || 85) / 100, // 转换为0-1范围
+                decisionCard: {
+                    supportReasons: assessment.supportReasons || ['符合ECMO适应症标准'],
+                    opposeReasons: assessment.opposeReasons || ['需要权衡获益风险比'],
+                    guidelineReferences: assessment.guidelines || {}
+                },
+                recommendations: assessment.recommendations || ['请咨询ECMO专科医生进行详细评估'],
+                detailedScores: assessment.detailedScores || {}
+            };
+
+            this.displayAssessmentResult(resultData);
             this.showModal();
+        } else {
+            this.showError('找不到该评估记录');
+        }
+    }
+
+    // 添加缺失的showModal函数
+    showModal() {
+        const modal = document.getElementById('result-modal');
+        if (modal) {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        }
+    }
+
+    // 修复closeModal函数
+    closeModal() {
+        const modal = document.getElementById('result-modal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // 恢复背景滚动
         }
     }
 
@@ -1161,6 +1389,92 @@ class ECMOExpertSystem {
             window.location.href = '/static/login.html';
         }
     }
+
+    // ===== 添加缺失的UI提示功能 =====
+
+    // 显示成功提示
+    showSuccess(message) {
+        this.showNotification(message, 'success');
+    }
+
+    // 显示错误提示
+    showError(message) {
+        this.showNotification(message, 'error');
+    }
+
+    // 显示加载状态
+    showLoading(message) {
+        // 创建或显示加载遮罩
+        let loadingOverlay = document.getElementById('loading-overlay');
+        if (!loadingOverlay) {
+            loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loading-overlay';
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">${message || '正在加载...'}</div>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+        } else {
+            loadingOverlay.querySelector('.loading-text').textContent = message || '正在加载...';
+        }
+        loadingOverlay.style.display = 'flex';
+    }
+
+    // 隐藏加载状态
+    hideLoading() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    // 通用通知功能
+    showNotification(message, type = 'info') {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+
+        // 图标映射
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-icon">${icons[type] || icons.info}</span>
+                <span class="notification-message">${message}</span>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+        // 添加到页面
+        document.body.appendChild(notification);
+
+        // 自动消失
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.classList.add('notification-fade-out');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }, 4000);
+
+        // 添加点击关闭功能
+        notification.addEventListener('click', () => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        });
+    }
 }
 
 // 全局函数
@@ -1172,7 +1486,7 @@ function showSection(section) {
 
 function closeModal() {
     if (window.ecmoSystem) {
-        window.ecmoSystem.closeModal();
+        window.ecmoSystem.closeAllModals();
     }
 }
 

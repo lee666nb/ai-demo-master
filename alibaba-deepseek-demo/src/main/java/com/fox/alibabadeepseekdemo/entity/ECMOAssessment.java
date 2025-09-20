@@ -217,4 +217,90 @@ public class ECMOAssessment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
+
+    // ===== 手动添加关键getter方法 - 解决Lombok可能的问题 =====
+
+    public Boolean getCanUseECMO() {
+        return this.canUseECMO;
+    }
+
+    public String getDiagnosis() {
+        return this.diagnosis;
+    }
+
+    public String getEvidence() {
+        return this.evidence;
+    }
+
+    public Double getConfidence() {
+        return this.confidence;
+    }
+
+    public String getRiskColor() {
+        return this.riskColor;
+    }
+
+    public List<String> getSupportReasons() {
+        return this.supportReasons;
+    }
+
+    public List<String> getOpposeReasons() {
+        return this.opposeReasons;
+    }
+
+    public List<String> getRecommendations() {
+        return this.recommendations;
+    }
+
+    public List<String> getKeyRiskFactors() {
+        return this.keyRiskFactors;
+    }
+
+    public Map<String, String> getGuidelineReferences() {
+        return this.guidelineReferences;
+    }
+
+    public Map<String, Object> getDetailedScores() {
+        return this.detailedScores;
+    }
+
+    public String getFinalRecommendation() {
+        return this.finalRecommendation;
+    }
+
+    public String getContraindications() {
+        return this.contraindications;
+    }
+
+    public String getPrecautions() {
+        return this.precautions;
+    }
+
+    public String getAssessmentTime() {
+        return this.createdAt != null ? this.createdAt.toString() : null;
+    }
+
+    // ===== 添加缺失的工具方法 =====
+
+    // 显示成功提示
+    public void showSuccess(String message) {
+        // 这个方法应该在前端JavaScript中实现
+        System.out.println("SUCCESS: " + message);
+    }
+
+    // 显示错误提示
+    public void showError(String message) {
+        // 这个方法应该在前端JavaScript中实现
+        System.out.println("ERROR: " + message);
+    }
+
+    // 显示加载状态
+    public void showLoading(String message) {
+        System.out.println("LOADING: " + message);
+    }
+
+    // 隐藏加载状态
+    public void hideLoading() {
+        System.out.println("Loading hidden");
+    }
 }

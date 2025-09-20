@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECMO 专家后台管理</title>
+  <link rel="stylesheet" href="/static/css/admin.css" />
+  <!-- Vue 3 + Vue Router（CDN） -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app" class="admin-layout">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="brand">ECMO 管理</div>
+      <nav class="nav">
+        <router-link class="nav-link" to="/dashboard">仪表盘</router-link>
+        <router-link class="nav-link" to="/users">用户管理</router-link>
+        <router-link class="nav-link" to="/assessments">评估记录</router-link>
+        <router-link class="nav-link" to="/database">诊疗数据库</router-link>
+        <router-link class="nav-link" to="/settings">系统设置</router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <a class="link" href="/static/ecmo-expert.html">↩ 返回专家系统</a>
+      </div>
+    </aside>
+
+    <!-- 主区 -->
+    <div class="main">
+      <header class="topbar">
+        <h1>后台管理</h1>
+        <div class="user" @click.stop="ui.userMenuOpen = !ui.userMenuOpen">
+          <div class="avatar" :style="avatarStyle">{{ avatarFallback }}</div>
+          <span class="name">{{ profileName }}</span>
+          <span class="chevron">▾</span>
+          <div class="menu" v-show="ui.userMenuOpen" @click.stop>
+            <button class="menu-item" @click="goProfile">个人资料</button>
+            <button class="menu-item" @click="logout">退出登录</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" @click="ui.userMenuOpen=false">
+        <router-view></router-view>
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/js/admin-vue.js"></script>
+</body>
+</html>

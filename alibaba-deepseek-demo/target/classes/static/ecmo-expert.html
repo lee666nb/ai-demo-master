@@ -14,9 +14,21 @@
         <header class="header">
             <div class="header-content">
                 <h1><i class="icon-heart"></i> ECMO诊疗专家系统</h1>
-                <div class="user-info">
-                    <span id="username">医生用户</span>
-                    <button class="btn-logout" onclick="logout()">退出</button>
+                <!-- 替换原 user-info 为带下拉的用户菜单 -->
+                <div class="user-menu">
+                    <div class="user-trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+                        <div class="avatar" id="userAvatar">👨‍⚕️</div>
+                        <span id="username">医生用户</span>
+                        <span class="chevron">▾</span>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown" role="menu">
+                        <button class="dropdown-item" onclick="window.ecmoSystem.openProfileModal()">个人资料</button>
+                        <button class="dropdown-item" onclick="window.ecmoSystem.openPasswordModal()">修改密码</button>
+                        <button class="dropdown-item" onclick="window.ecmoSystem.openNotifications()">通知</button>
+                        <a class="dropdown-item" href="/admin.html">后台管理</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger" onclick="logout()">退出登录</button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -257,7 +269,7 @@
                                 <option value="month">近一月</option>
                             </select>
                         </div>
-                        <button onclick="clearAllHistory()" class="btn-danger">
+                        <button onclick="window.ecmoSystem.clearAllHistory()" class="btn-danger">
                             <i class="icon-trash"></i>
                             清空历史
                         </button>
@@ -997,440 +1009,113 @@
         </div>
     </div>
 
+    <!-- 新增：个人资料模态框 -->
+    <div id="profile-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>个人资料</h2>
+                <button class="modal-close" onclick="window.ecmoSystem.closeModalById('profile-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="profile-form" class="assessment-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>用户名</label>
+                            <input type="text" id="profile-username" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>真实姓名</label>
+                            <input type="text" id="profile-realName" placeholder="张三">
+                        </div>
+                        <div class="form-group">
+                            <label>科室</label>
+                            <input type="text" id="profile-department" placeholder="重症医学科">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>职称</label>
+                            <input type="text" id="profile-title" placeholder="主任医师">
+                        </div>
+                        <div class="form-group">
+                            <label>医院</label>
+                            <input type="text" id="profile-hospital" placeholder="XX医院">
+                        </div>
+                        <div class="form-group">
+                            <label>电话</label>
+                            <input type="text" id="profile-phone" placeholder="138****8888">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>邮箱</label>
+                            <input type="email" id="profile-email" placeholder="example@hospital.cn">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>头像URL</label>
+                            <input type="text" id="profile-avatarUrl" placeholder="https://...">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.ecmoSystem.closeModalById('profile-modal')">取消</button>
+                <button class="btn-primary" onclick="window.ecmoSystem.saveProfile()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增：修改密码模态框 -->
+    <div id="password-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>修改密码</h2>
+                <button class="modal-close" onclick="window.ecmoSystem.closeModalById('password-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="password-form" class="assessment-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>当前密码</label>
+                            <input type="password" id="pwd-current" required>
+                        </div>
+                        <div class="form-group">
+                            <label>新密码</label>
+                            <input type="password" id="pwd-new" required>
+                        </div>
+                        <div class="form-group">
+                            <label>确认新密码</label>
+                            <input type="password" id="pwd-confirm" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.ecmoSystem.closeModalById('password-modal')">取消</button>
+                <button class="btn-primary" onclick="window.ecmoSystem.savePassword()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增：通知模态框 -->
+    <div id="notice-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>通知</h2>
+                <button class="modal-close" onclick="window.ecmoSystem.closeModalById('notice-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="notice-list" class="guidelines">
+                    <div class="guideline-item">暂无新通知</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.ecmoSystem.closeModalById('notice-modal')">关闭</button>
+                <button class="btn-primary" onclick="window.ecmoSystem.markAllRead()">全部已读</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/ecmo-expert.js"></script>
-    <script>
-        // 全局函数
-        function showSection(section) {
-            window.ecmoSystem.showSection(section);
-        }
-
-        function resetForm() {
-            document.getElementById('ecmo-form').reset();
-            window.ecmoSystem.setDefaultValues();
-        }
-
-        function closeModal() {
-            window.ecmoSystem.closeModal();
-        }
-
-        function saveAssessment() {
-            window.ecmoSystem.saveCurrentAssessment();
-        }
-
-        function deleteAssessment(assessmentId) {
-            window.ecmoSystem.deleteAssessment(assessmentId);
-        }
-
-        function logout() {
-            localStorage.removeItem('username');
-            window.location.href = '/static/login.html';
-        }
-
-        // 初始化系统
-        window.addEventListener('DOMContentLoaded', () => {
-            window.ecmoSystem = new ECMOExpertSystem();
-            // 初始化ECMO介绍页面图表
-            initECMOCharts();
-        });
-
-        // ECMO图表初始化函数
-        function initECMOCharts() {
-            // 延迟初始化图表，确保页面元素已加载
-            setTimeout(() => {
-                if (document.getElementById('ecmoTypesChart')) {
-                    initECMOTypesChart();
-                }
-                if (document.getElementById('indicationsChart')) {
-                    initIndicationsChart();
-                }
-                if (document.getElementById('survivalRateChart')) {
-                    initSurvivalRateChart();
-                }
-                if (document.getElementById('ageSuccessChart')) {
-                    initAgeSuccessChart();
-                }
-                if (document.getElementById('complicationsChart')) {
-                    initComplicationsChart();
-                }
-                if (document.getElementById('trendChart')) {
-                    initTrendChart();
-                }
-            }, 100);
-        }
-
-        // ECMO类型分布图表
-        function initECMOTypesChart() {
-            const ctx = document.getElementById('ecmoTypesChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['VV-ECMO (静脉-静脉)', 'VA-ECMO (静脉-动脉)', 'VAV-ECMO (静脉-动脉-静脉)'],
-                    datasets: [{
-                        data: [65, 30, 5],
-                        backgroundColor: [
-                            '#3b82f6', // 蓝色
-                            '#10b981', // 绿色
-                            '#f59e0b'  // 橙色
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 适应症分布图表
-        function initIndicationsChart() {
-            const ctx = document.getElementById('indicationsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['ARDS', '心源性休克', '心脏骤停', '肺栓塞', '暴发性心肌炎', '其他'],
-                    datasets: [{
-                        data: [35, 25, 15, 10, 8, 7],
-                        backgroundColor: [
-                            '#ef4444', // 红色
-                            '#8b5cf6', // 紫色
-                            '#06b6d4', // 青色
-                            '#84cc16', // 绿色
-                            '#f97316', // 橙色
-                            '#6b7280'  // 灰色
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 生存率图表
-        function initSurvivalRateChart() {
-            const ctx = document.getElementById('survivalRateChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['ARDS', '心源性休克', '心脏骤停', '肺栓塞', '暴发性心肌炎'],
-                    datasets: [{
-                        label: '生存率 (%)',
-                        data: [65, 45, 35, 70, 75],
-                        backgroundColor: [
-                            '#3b82f6',
-                            '#10b981',
-                            '#f59e0b',
-                            '#ef4444',
-                            '#8b5cf6'
-                        ],
-                        borderColor: [
-                            '#2563eb',
-                            '#059669',
-                            '#d97706',
-                            '#dc2626',
-                            '#7c3aed'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: '生存率 (%)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '疾病类型'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '生存率: ' + context.parsed.y + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 年龄组别成功率图表
-        function initAgeSuccessChart() {
-            const ctx = document.getElementById('ageSuccessChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['0-18岁', '19-30岁', '31-45岁', '46-60岁', '61-70岁', '70岁以上'],
-                    datasets: [{
-                        label: '成功率',
-                        data: [75, 80, 70, 65, 55, 40],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#3b82f6',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: '成功率 (%)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '年龄组'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '成功率: ' + context.parsed.y + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 并发症发生率图表
-        function initComplicationsChart() {
-            const ctx = document.getElementById('complicationsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['出血', '感染', '血栓形成', '神经系统', '肾功能损害', '机械故障', '肢体缺血'],
-                    datasets: [{
-                        label: '发生率 (%)',
-                        data: [40, 25, 20, 15, 18, 8, 12],
-                        backgroundColor: [
-                            '#ef4444',
-                            '#f97316',
-                            '#eab308',
-                            '#22c55e',
-                            '#06b6d4',
-                            '#8b5cf6',
-                            '#ec4899'
-                        ],
-                        borderColor: [
-                            '#dc2626',
-                            '#ea580c',
-                            '#ca8a04',
-                            '#16a34a',
-                            '#0891b2',
-                            '#7c3aed',
-                            '#db2777'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y', // 水平条形图
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            max: 50,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: '发生率 (%)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '并发症类型'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed.x + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 发展趋势图表
-        function initTrendChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
-                    datasets: [
-                        {
-                            label: '全球ECMO应用量',
-                            data: [8500, 9200, 10800, 12500, 14200, 18500, 22000, 25500, 28000, 31000],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.3,
-                            pointBackgroundColor: '#3b82f6',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5
-                        },
-                        {
-                            label: '中国ECMO应用量',
-                            data: [450, 580, 720, 950, 1200, 1800, 2500, 3200, 3800, 4500],
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.3,
-                            pointBackgroundColor: '#ef4444',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '应用量 (例次)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '年份'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                padding: 20,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' 例次';
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    }
-                }
-            });
-        }
-    </script>
 </body>
 </html>
